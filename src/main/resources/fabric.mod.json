@@ -8,9 +8,7 @@
     "RedLime"
   ],
   "contact": {
-    "homepage": "",
-    "issues": "",
-    "sources": ""
+    "sources": "https://github.com/RedLime/DetailArmorBar"
   },
   "license": "MIT",
   "icon": "assets/detailab/icon.png",
