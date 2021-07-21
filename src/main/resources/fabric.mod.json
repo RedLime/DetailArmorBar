@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "id": "detailab",
+  "version": "${version}",
+  "name": "Detail Armor Bar",
+  "description": "Show more details of armors in Armor bar!",
+  "authors": [
+    "RedLime"
+  ],
+  "contact": {
+    "homepage": "",
+    "issues": "",
+    "sources": ""
+  },
+  "license": "MIT",
+  "icon": "assets/detailab/icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      {
+        "adapter": "kotlin",
+        "value": "com.redlimerl.detailab.DetailArmorBars"
+      }
+    ],
+    "modmenu": [
+      "com.redlimerl.detailab.config.ModConfigImpl"
+    ]
+  },
+  "mixins": [
+    "detailab.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.11.6",
+    "fabric": "*",
+    "fabric-language-kotlin": ">=1.6.2+kotlin.1.5.20",
+    "minecraft": "1.17.x",
+    "java": ">=16"
+  }
+}
