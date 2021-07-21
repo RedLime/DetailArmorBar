@@ -173,6 +173,7 @@ class ArmorBarRenderer {
                 if (count * 2 + 1 == netherites.total) {
                     ArmorBarRenderer().drawTexture(matrices, xPos, yPos, 0, 9)
                 }
+                if (count * 2 + 1 > netherites.total) break
             }
         }
 
@@ -181,20 +182,20 @@ class ArmorBarRenderer {
             if (totalEnchants > 0) {
                 val xPos = screenWidth + count * 8
                 if (count * 2 + 1 < totalEnchants) {
-                    var min = 0
-                    var max = 0
-                    for (pw in 0..3) {
-                        if (min == 0 && protectArr[pw] > 1) {
+                    var min = -1
+                    var max = -1
+                    for (pw in 0..4) {
+                        if (min == -1 && protectArr[pw] > 1) {
                             min = pw
                             break
-                        } else if (min == 0 && protectArr[pw] == 1) {
+                        } else if (min == -1 && protectArr[pw] == 1) {
                             min = pw
-                        } else if (min != 0 && max == 0 && protectArr[pw] >= 1) max = pw
+                        } else if (min != -1 && max == -1 && protectArr[pw] >= 1) max = pw
                     }
-                    if (min != 0 && max != 0) {
-                        ArmorBarRenderer().drawEnchantTexture(matrices, xPos, yPos, getProtectColor(protectArr), 2)
-                        protectArr[min] = 0
+                    if (min != -1 && max != -1) {
                         ArmorBarRenderer().drawEnchantTexture(matrices, xPos, yPos, getProtectColor(protectArr), 1)
+                        protectArr[min] = 0
+                        ArmorBarRenderer().drawEnchantTexture(matrices, xPos, yPos, getProtectColor(protectArr), 2)
                         protectArr[max] -= 1
                     } else {
                         ArmorBarRenderer().drawEnchantTexture(matrices, xPos, yPos, getProtectColor(protectArr))
@@ -204,6 +205,8 @@ class ArmorBarRenderer {
                 if (count * 2 + 1 == totalEnchants) {
                     ArmorBarRenderer().drawEnchantTexture(matrices, xPos, yPos, getProtectColor(protectArr))
                 }
+                if (count * 2 + 1 > totalEnchants) break
+
             }
         }
 
@@ -225,6 +228,7 @@ class ArmorBarRenderer {
                     else
                         ArmorBarRenderer().drawTexture(matrices, xPos, yPos, 0, 18, thornsColor)
                 }
+                if (count * 2 + 1 > thorns.total) break
             }
         }
 
