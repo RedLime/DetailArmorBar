@@ -1,28 +1,25 @@
-@file:Suppress("SameParameterValue")
+@file:Suppress("SameParameterValue", "DEPRECATION")
 
 package com.redlimerl.detailab
 
+import com.mojang.blaze3d.platform.GlStateManager
 import com.mojang.blaze3d.systems.RenderSystem
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.gui.DrawableHelper
 import net.minecraft.client.gui.hud.InGameHud
-import net.minecraft.client.render.*
 import net.minecraft.client.util.math.MatrixStack
-import net.minecraft.enchantment.Enchantment
 import net.minecraft.enchantment.EnchantmentHelper
+import net.minecraft.enchantment.Enchantments
 import net.minecraft.enchantment.ProtectionEnchantment
-import net.minecraft.enchantment.ThornsEnchantment
 import net.minecraft.entity.attribute.EntityAttributes
-import net.minecraft.entity.damage.DamageSource
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.ArmorItem
 import net.minecraft.item.ArmorMaterials
 import net.minecraft.item.ItemStack
 import net.minecraft.util.Identifier
 import net.minecraft.util.math.MathHelper
-import net.minecraft.util.registry.Registry
 import org.apache.commons.lang3.mutable.MutableInt
 import java.awt.Color
 import kotlin.math.roundToInt
@@ -73,18 +70,17 @@ class ArmorBarRenderer {
             var count = 0
             for (itemStack in equipment) {
                 if (!itemStack.isEmpty) {
-                    val nbtList = itemStack.enchantments
-                    for (i in nbtList.indices) {
-                        val nbtCompound = nbtList.getCompound(i)
-                        Registry.ENCHANTMENT.getOrEmpty(EnchantmentHelper.getIdFromNbt(nbtCompound))
-                            .ifPresent { enchantment: Enchantment? ->
-                                if (enchantment is ProtectionEnchantment) {
-                                    if (enchantment.protectionType == type) {
-                                        mutableInt.add(EnchantmentHelper.getLevelFromNbt(nbtCompound))
-                                        count++
-                                    }
-                                }
-                            }
+                    val enchantment = when (type) {
+                        ProtectionEnchantment.Type.ALL -> Enchantments.PROTECTION
+                        ProtectionEnchantment.Type.EXPLOSION -> Enchantments.BLAST_PROTECTION
+                        ProtectionEnchantment.Type.FALL -> Enchantments.FEATHER_FALLING
+                        ProtectionEnchantment.Type.FIRE -> Enchantments.FIRE_PROTECTION
+                        ProtectionEnchantment.Type.PROJECTILE -> Enchantments.PROJECTILE_PROTECTION
+                    }
+                    val power = EnchantmentHelper.getLevel(enchantment, itemStack)
+                    if (power > 0) {
+                        mutableInt.add(power)
+                        count++
                     }
                 }
             }
@@ -96,17 +92,10 @@ class ArmorBarRenderer {
             var count = 0
             for (itemStack in equipment) {
                 if (!itemStack.isEmpty) {
-                    val nbtList = itemStack.enchantments
-                    for (i in nbtList.indices) {
-                        val nbtCompound = nbtList.getCompound(i)
-                        Registry.ENCHANTMENT.getOrEmpty(EnchantmentHelper.getIdFromNbt(nbtCompound))
-                            .ifPresent { enchantment: Enchantment? ->
-                                if (enchantment is ThornsEnchantment) {
-                                    val level = EnchantmentHelper.getLevelFromNbt(nbtCompound)
-                                    mutableInt.add(if (level == 1) 1 else (level*2)-1)
-                                    count++
-                                }
-                            }
+                    val power = EnchantmentHelper.getLevel(Enchantments.THORNS, itemStack)
+                    if (power > 0) {
+                        mutableInt.add(power)
+                        count++
                     }
                 }
             }
@@ -157,9 +146,10 @@ class ArmorBarRenderer {
 
 
         client.textureManager.bindTexture(GUI_ARMOR_BAR)
-        RenderSystem.enableBlend()
-        RenderSystem.setShader(GameRenderer::getPositionTexShader)
-        RenderSystem.setShaderTexture(0, GUI_ARMOR_BAR)
+        GlStateManager.pushMatrix()
+        //RenderSystem.enableBlend()
+        //RenderSystem.setShader(GameRenderer::getPositionTexShader)'
+        //RenderSystem.setShaderTexture(0, GUI_ARMOR_BAR)
         //hud.drawTexture(matrices, 0, 0, 0, 0, 256, 256)
 
 
@@ -233,8 +223,8 @@ class ArmorBarRenderer {
         }
 
 
-        RenderSystem.disableBlend()
-        RenderSystem.setShaderColor(1f, 1f, 1f, 1f)
+        GlStateManager.popMatrix()
+        RenderSystem.color4f(1f, 1f, 1f, 1f)
         client.textureManager.bindTexture(DrawableHelper.GUI_ICONS_TEXTURE)
     }
 
@@ -256,12 +246,12 @@ class ArmorBarRenderer {
     }
 
     private fun drawTexture(matrices: MatrixStack, x: Int, y: Int, u: Int, v: Int, color: Color) {
-        RenderSystem.setShaderColor(color.red/255f, color.green/255f, color.blue/255f, color.alpha/100f)
+        RenderSystem.color4f(color.red/255f, color.green/255f, color.blue/255f, color.alpha/100f)
         InGameHud.drawTexture(matrices, x, y, u.toFloat(), v.toFloat(), 9, 9, 128, 128)
     }
 
     private fun drawTexture(matrices: MatrixStack, x: Int, y: Int, u: Int, v: Int) {
-        RenderSystem.setShaderColor(1f, 1f, 1f, 1f)
+        RenderSystem.color4f(1f, 1f, 1f, 1f)
         InGameHud.drawTexture(matrices, x, y, u.toFloat(), v.toFloat(), 9, 9, 128, 128)
     }
 }

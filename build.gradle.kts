@@ -35,17 +35,8 @@ dependencies {
     }
 }
 tasks {
-    val javaVersion = JavaVersion.VERSION_16
     withType<JavaCompile> {
         options.encoding = "UTF-8"
-        sourceCompatibility = javaVersion.toString()
-        targetCompatibility = javaVersion.toString()
-        options.release.set(javaVersion.toString().toInt())
-    }
-    withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-        kotlinOptions { jvmTarget = javaVersion.toString() }
-        sourceCompatibility = javaVersion.toString()
-        targetCompatibility = javaVersion.toString()
     }
     jar { from("LICENSE") { rename { "${it}_${base.archivesName}" } } }
     processResources {
@@ -53,9 +44,6 @@ tasks {
         filesMatching("fabric.mod.json") { expand(mutableMapOf("version" to project.version)) }
     }
     java {
-        toolchain { languageVersion.set(JavaLanguageVersion.of(javaVersion.toString())) }
-        sourceCompatibility = javaVersion
-        targetCompatibility = javaVersion
         withSourcesJar()
     }
 }
