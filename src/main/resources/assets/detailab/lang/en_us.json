@@ -2,7 +2,7 @@
   "option.detailarmorbar.enable": "Enabled",
   "option.detailarmorbar.disable": "Disabled",
   "option.title.detailarmorbar.toggles": "Toggle Features",
-  "option.title.detailarmorbar.effect": "Effect/Animation Settings",
+  "option.title.detailarmorbar.effects": "Effect/Animation Settings",
   "option.detailarmorbar.effects.effect_type": "Protection Enchantments Effect Type",
   "option.detailarmorbar.effects.effect_type.aura": "Aura",
   "option.detailarmorbar.effects.effect_type.outline": "Outline",
