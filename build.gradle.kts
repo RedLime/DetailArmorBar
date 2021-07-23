@@ -33,6 +33,7 @@ dependencies {
     modApi("me.shedaniel.cloth:cloth-config-fabric:$clothApiVersion") {
         exclude(group = "net.fabricmc.fabric-api")
     }
+    include("me.shedaniel.cloth:cloth-config-fabric:$clothApiVersion")
 }
 tasks {
     val javaVersion = JavaVersion.VERSION_16
@@ -47,7 +48,9 @@ tasks {
         sourceCompatibility = javaVersion.toString()
         targetCompatibility = javaVersion.toString()
     }
-    jar { from("LICENSE") { rename { "${it}_${base.archivesName}" } } }
+    jar {
+        from("LICENSE") { rename { "${it}_${base.archivesName}" } }
+    }
     processResources {
         inputs.property("version", project.version)
         filesMatching("fabric.mod.json") { expand(mutableMapOf("version" to project.version)) }
