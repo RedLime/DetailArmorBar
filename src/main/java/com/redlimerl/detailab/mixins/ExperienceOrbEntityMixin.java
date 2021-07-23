@@ -14,7 +14,7 @@ import java.util.Map;
 @Mixin(value = ExperienceOrbEntity.class)
 public class ExperienceOrbEntityMixin {
 
-    @Redirect(method = "repairPlayerGears(Lnet/minecraft/entity/LivingEntity/PlayerEntity;I)I",
+    @Redirect(method = "repairPlayerGears(Lnet/minecraft/entity/player/PlayerEntity;I)I",
             at = @At(value = "INVOKE", target = "Ljava/util/Map$Entry;getValue()Ljava/lang/Object;"))
     private Object repairPlayerGears(Map.Entry<EquipmentSlot, ItemStack> entry) {
         ItemStack itemStack = entry.getValue();
