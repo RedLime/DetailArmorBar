@@ -1,5 +1,23 @@
 {
-  "option.detailarmorbar.effect_type": "보호 인챈트 효과 방식",
-  "option.detailarmorbar.effect_type.aura": "아우라",
-  "option.detailarmorbar.effect_type.outline": "테두리"
+  "option.detailarmorbar.enable": "켜짐",
+  "option.detailarmorbar.disable": "꺼짐",
+  "option.title.detailarmorbar.toggles": "기능 설정",
+  "option.title.detailarmorbar.effect": "애니메이션 설정",
+  "option.detailarmorbar.effects.effect_type": "보호 인챈트 효과 방식",
+  "option.detailarmorbar.effects.effect_type.aura": "아우라",
+  "option.detailarmorbar.effects.effect_type.outline": "테두리",
+  "option.detailarmorbar.effects.effect_speed": "애니메이션 속도 (보호 인챈트, 내구도 경고)",
+  "option.detailarmorbar.effects.effect_speed.normal": "보통",
+  "option.detailarmorbar.effects.effect_speed.slow": "느리게",
+  "option.detailarmorbar.effects.effect_speed.very_slow": "아주 느리게",
+  "option.detailarmorbar.effects.effect_speed.fast": "빠르게",
+  "option.detailarmorbar.effects.effect_speed.very_fast": "아주 빠르게",
+  "option.detailarmorbar.effects.thorn": "가시 애니메이션 방식",
+  "option.detailarmorbar.effects.thorn.static": "정적(고정)",
+  "option.detailarmorbar.effects.thorn.animation": "애니메이션",
+  "option.detailarmorbar.toggle.enchantments": "보호 인챈트 효과",
+  "option.detailarmorbar.toggle.netherites": "네더라이트 갑옷 게이지",
+  "option.detailarmorbar.toggle.thorns": "가시 갑옷 게이지",
+  "option.detailarmorbar.toggle.durability": "적은 내구도 경고",
+  "option.detailarmorbar.toggle.mending": "수선으로 갑옷이 수리될 시 효과"
 }

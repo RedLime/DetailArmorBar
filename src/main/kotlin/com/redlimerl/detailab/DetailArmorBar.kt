@@ -9,7 +9,7 @@ import java.nio.file.Path
 
 
 @Suppress("UNUSED")
-object DetailArmorBars: ClientModInitializer {
+object DetailArmorBar: ClientModInitializer {
 
     val LOGGER = LogManager.getLogger("DetailArmorBar")
     const val MOD_ID = "detailab"
@@ -17,10 +17,12 @@ object DetailArmorBars: ClientModInitializer {
     private var config: Config? = null
 
     fun getConfig(): Config {
-        if (config == null) {
-            loadConfig();
-        }
+        if (config == null) loadConfig()
         return config!!
+    }
+
+    fun getTicks(): Long {
+        return System.currentTimeMillis()/50
     }
 
     private fun loadConfig() {

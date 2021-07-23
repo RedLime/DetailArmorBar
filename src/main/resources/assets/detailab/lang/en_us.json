@@ -1,5 +1,23 @@
 {
-  "option.detailarmorbar.effect_type": "Protection Enchantments Effect Type",
-  "option.detailarmorbar.effect_type.aura": "Aura",
-  "option.detailarmorbar.effect_type.outline": "Outline"
+  "option.detailarmorbar.enable": "Enabled",
+  "option.detailarmorbar.disable": "Disabled",
+  "option.title.detailarmorbar.toggles": "Toggle Features",
+  "option.title.detailarmorbar.effect": "Effect/Animation Settings",
+  "option.detailarmorbar.effects.effect_type": "Protection Enchantments Effect Type",
+  "option.detailarmorbar.effects.effect_type.aura": "Aura",
+  "option.detailarmorbar.effects.effect_type.outline": "Outline",
+  "option.detailarmorbar.effects.effect_speed": "Effect Speed (for Protection, Low Durability)",
+  "option.detailarmorbar.effects.effect_speed.normal": "Normal",
+  "option.detailarmorbar.effects.effect_speed.slow": "Slow",
+  "option.detailarmorbar.effects.effect_speed.very_slow": "Very Slow",
+  "option.detailarmorbar.effects.effect_speed.fast": "Fast",
+  "option.detailarmorbar.effects.effect_speed.very_fast": "Very Fast",
+  "option.detailarmorbar.effects.thorn": "Thorn Animation Type",
+  "option.detailarmorbar.effects.thorn.static": "Static",
+  "option.detailarmorbar.effects.thorn.animation": "Animation",
+  "option.detailarmorbar.toggle.enchantments": "Toggle Protections Effect",
+  "option.detailarmorbar.toggle.netherites": "Toggle Netherite Armor Bar",
+  "option.detailarmorbar.toggle.thorns": "Toggle Thorns Armor Bar",
+  "option.detailarmorbar.toggle.durability": "Toggle Low Durability Effect",
+  "option.detailarmorbar.toggle.mending": "Toggle Repair Effect by Mending"
 }

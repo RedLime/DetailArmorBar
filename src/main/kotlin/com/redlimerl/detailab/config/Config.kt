@@ -1,7 +1,9 @@
 package com.redlimerl.detailab.config
 
 import com.google.gson.GsonBuilder
-import com.redlimerl.detailab.DetailArmorBars
+import com.redlimerl.detailab.AnimationType
+import com.redlimerl.detailab.DetailArmorBar
+import com.redlimerl.detailab.EffectSpeedType
 import com.redlimerl.detailab.ProtectionEffectType
 import java.io.File
 import java.io.FileReader
@@ -20,7 +22,7 @@ class Config(private val file: File) {
                     options = GSON.fromJson(reader, Options::class.java)
                 }
             } catch (e: IOException) {
-                DetailArmorBars.LOGGER.error("Error loading config", e)
+                DetailArmorBar.LOGGER.error("Error loading config", e)
             }
             if (options != null) {
                 if (options!!.replaceInvalidOptions(Options.DEFAULT)) {
@@ -38,12 +40,21 @@ class Config(private val file: File) {
         try {
             FileWriter(file).use { writer -> writer.write(GSON.toJson(options)) }
         } catch (e: IOException) {
-            DetailArmorBars.LOGGER.error("Error saving config", e)
+            DetailArmorBar.LOGGER.error("Error saving config", e)
         }
     }
 
     class Options {
         var effectType: ProtectionEffectType? = ProtectionEffectType.AURA
+        var effectSpeed: EffectSpeedType? = EffectSpeedType.NORMAL
+        var effectThorn: AnimationType? = AnimationType.ANIMATION
+
+        var toggleEnchants = true
+        var toggleNetherites = true
+        var toggleThorns = true
+        var toggleDurability = true
+        var toggleMending = true
+
         fun replaceInvalidOptions(options: Options): Boolean {
             var invalid = false
             if (effectType == null) {

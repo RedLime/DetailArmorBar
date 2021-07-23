@@ -3,6 +3,7 @@
 package com.redlimerl.detailab
 
 import com.mojang.blaze3d.systems.RenderSystem
+import com.redlimerl.detailab.DetailArmorBar.getConfig
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
 import net.minecraft.client.MinecraftClient
@@ -10,12 +11,8 @@ import net.minecraft.client.gui.DrawableHelper
 import net.minecraft.client.gui.hud.InGameHud
 import net.minecraft.client.render.*
 import net.minecraft.client.util.math.MatrixStack
-import net.minecraft.enchantment.Enchantment
-import net.minecraft.enchantment.EnchantmentHelper
-import net.minecraft.enchantment.ProtectionEnchantment
-import net.minecraft.enchantment.ThornsEnchantment
+import net.minecraft.enchantment.*
 import net.minecraft.entity.attribute.EntityAttributes
-import net.minecraft.entity.damage.DamageSource
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.ArmorItem
 import net.minecraft.item.ArmorMaterials
@@ -25,6 +22,7 @@ import net.minecraft.util.math.MathHelper
 import net.minecraft.util.registry.Registry
 import org.apache.commons.lang3.mutable.MutableInt
 import java.awt.Color
+import kotlin.math.ceil
 import kotlin.math.roundToInt
 
 @Environment(EnvType.CLIENT)
@@ -34,19 +32,32 @@ class ArmorBarRenderer {
 
     companion object {
         val INSTANCE = ArmorBarRenderer()
-        val GUI_ARMOR_BAR = Identifier(DetailArmorBars.MOD_ID, "textures/armor_bar.png")
+        val GUI_ARMOR_BAR = Identifier(DetailArmorBar.MOD_ID, "textures/armor_bar.png")
+        var LAST_THORNS = 0L
+        var LAST_MENDING = 0L
+
+        private fun getAnimationSpeed(): Int {
+            return (30*when(getConfig().options?.effectSpeed) {
+                EffectSpeedType.VERY_FAST -> 0.5f
+                EffectSpeedType.FAST -> 0.75f
+                EffectSpeedType.SLOW -> 1.25f
+                EffectSpeedType.VERY_SLOW -> 1.5f
+                else -> 1.0f
+            }).toInt()
+        }
 
         private fun getProtectColor(g: Int, p: Int, e: Int, f: Int, a: Int): Color {
-            val alpha = when (DetailArmorBars.getConfig().options?.effectType) {
+            val speed = getAnimationSpeed()
+            val alpha = when (getConfig().options?.effectType) {
                 ProtectionEffectType.AURA -> {
                     80
                 }
                 ProtectionEffectType.OUTLINE -> {
-                    val time = System.currentTimeMillis()/50
+                    val time = DetailArmorBar.getTicks()
                     when {
-                        time % 120 < 60 -> 0
-                        time % 60 < 30 -> (MathHelper.lerp((time % 30) / 29f, 0f, 0.65f)*255).roundToInt()
-                        else -> (MathHelper.lerp((time % 30) / 29f, 0.65f, 0f)*255).roundToInt()
+                        time % (speed*4) < (speed*2) -> 0
+                        time % (speed*2) < speed -> (MathHelper.lerp((time % speed) / (speed.toFloat()-1f), 0f, 0.65f)*255).roundToInt()
+                        else -> (MathHelper.lerp((time % speed) / (speed.toFloat()-1f), 0.65f, 0f)*255).roundToInt()
                     }
                 }
                 else -> {
@@ -66,6 +77,34 @@ class ArmorBarRenderer {
 
         private fun getProtectColor(s: IntArray): Color {
             return getProtectColor(s[0], s[1], s[2], s[3], s[4])
+        }
+
+        private fun getLowDurabilityColor(): Color {
+            val speed = getAnimationSpeed()
+            val time = DetailArmorBar.getTicks()
+            val alpha = when {
+                time % (speed*4) >= (speed*2) -> 0
+                time % (speed*2) < speed -> (MathHelper.lerp((time % speed) / (speed.toFloat()-1f), 0f, 0.65f)*255).roundToInt()
+                else -> (MathHelper.lerp((time % speed) / (speed.toFloat()-1f), 0.65f, 0f)*255).roundToInt()
+            }
+
+            return Color(255, 55, 55, alpha)
+        }
+
+        private fun getThornColor(): Color {
+            val time = DetailArmorBar.getTicks() - LAST_THORNS
+            return when {
+                getConfig().options?.effectThorn == AnimationType.STATIC -> {
+                    Color.WHITE
+                }
+                time > 19 -> {
+                    Color.WHITE
+                }
+                else -> {
+                    val cc = (MathHelper.lerp((time % 20) / 19f, 0f, 1f)*255).roundToInt()
+                    Color(255, cc, cc)
+                }
+            }
         }
 
         private fun getProtectLevel(equipment: Iterable<ItemStack>, type: ProtectionEnchantment.Type): LevelData {
@@ -129,6 +168,20 @@ class ArmorBarRenderer {
             }
             return LevelData(mutableInt.toInt(), count)
         }
+
+        private fun getLowDurability(equipment: Iterable<ItemStack>): Int {
+            var count = 0
+            for (itemStack in equipment) {
+                if (!itemStack.isEmpty) {
+                    if (itemStack.item is ArmorItem) {
+                        if ((itemStack.damage.toFloat() / itemStack.maxDamage * 100f) > 92f) {
+                            count += (itemStack.item as ArmorItem).protection
+                        }
+                    }
+                }
+            }
+            return count
+        }
     }
 
 
@@ -137,6 +190,10 @@ class ArmorBarRenderer {
 
 
     fun render(matrices: MatrixStack, player: PlayerEntity) {
+        client.profiler.swap("armor")
+
+        //println(LAST_MENDING)
+
         val generic = getProtectLevel(player.armorItems, ProtectionEnchantment.Type.ALL)
         val projectile = getProtectLevel(player.armorItems, ProtectionEnchantment.Type.PROJECTILE)
         val explosive = getProtectLevel(player.armorItems, ProtectionEnchantment.Type.EXPLOSION)
@@ -147,6 +204,7 @@ class ArmorBarRenderer {
         val thorns = getThorns(player.armorItems)
 
         val playerHealth = MathHelper.ceil(player.health)
+        val playerArmor = player.armor
         val totalEnchants = protectArr.sum()
         val maxHealth = player.getAttributeValue(EntityAttributes.GENERIC_MAX_HEALTH).toFloat().coerceAtLeast(playerHealth.toFloat())
         val absorptionHealth = MathHelper.ceil(player.absorptionAmount)
@@ -164,22 +222,26 @@ class ArmorBarRenderer {
 
 
         //Netherites Check
-        for (count in 0..9) {
-            if (netherites.total > 0) {
+        if (getConfig().options?.toggleNetherites == true) {
+            for (count in 0..9) {
+                if (netherites.total == 0 || count * 2 + 1 > netherites.total) break
+
                 val xPos = screenWidth + count * 8
                 if (count * 2 + 1 < netherites.total) {
-                    ArmorBarRenderer().drawTexture(matrices, xPos, yPos, 9, 9)
+                    drawTexture(matrices, xPos, yPos, 9, 9)
                 }
                 if (count * 2 + 1 == netherites.total) {
-                    ArmorBarRenderer().drawTexture(matrices, xPos, yPos, 0, 9)
+                    drawTexture(matrices, xPos, yPos, 0, 9)
                 }
                 if (count * 2 + 1 > netherites.total) break
             }
         }
 
         //Armor Enchantments
-        for (count in 0..9) {
-            if (totalEnchants > 0) {
+        if (getConfig().options?.toggleEnchants == true) {
+            for (count in 0..9) {
+                if (totalEnchants == 0 || count * 2 + 1 > totalEnchants) break
+
                 val xPos = screenWidth + count * 8
                 if (count * 2 + 1 < totalEnchants) {
                     var min = -1
@@ -193,42 +255,84 @@ class ArmorBarRenderer {
                         } else if (min != -1 && max == -1 && protectArr[pw] >= 1) max = pw
                     }
                     if (min != -1 && max != -1) {
-                        ArmorBarRenderer().drawEnchantTexture(matrices, xPos, yPos, getProtectColor(protectArr), 2)
+                        drawEnchantTexture(matrices, xPos, yPos, getProtectColor(protectArr), 2)
                         protectArr[min] = 0
-                        ArmorBarRenderer().drawEnchantTexture(matrices, xPos, yPos, getProtectColor(protectArr), 1)
+                        drawEnchantTexture(matrices, xPos, yPos, getProtectColor(protectArr), 1)
                         protectArr[max] -= 1
                     } else {
-                        ArmorBarRenderer().drawEnchantTexture(matrices, xPos, yPos, getProtectColor(protectArr))
+                        drawEnchantTexture(matrices, xPos, yPos, getProtectColor(protectArr))
                         protectArr[min] -= 2
                     }
                 }
                 if (count * 2 + 1 == totalEnchants) {
-                    ArmorBarRenderer().drawEnchantTexture(matrices, xPos, yPos, getProtectColor(protectArr))
+                    drawEnchantTexture(matrices, xPos, yPos, getProtectColor(protectArr))
                 }
-                if (count * 2 + 1 > totalEnchants) break
-
             }
         }
 
         //Thorns Check
-        val thornsColor = if (player.recentDamageSource?.attacker == null) Color.WHITE else Color.RED
-        for (count in 0..9) {
-            if (thorns.total > 0) {
+        if (getConfig().options?.toggleThorns == true) {
+            val thornsColor = getThornColor()
+            for (count in 0..9) {
+                if (thorns.total == 0 || count * 2 + 1 > thorns.total) break
+
                 val xPos = screenWidth + count * 8
                 if (count * 2 + 1 < thorns.total) {
                     when {
-                        count * 2 + 1 == netherites.total -> ArmorBarRenderer().drawTexture(matrices, xPos, yPos, 18, 18, thornsColor)
-                        count * 2 + 1 < netherites.total -> ArmorBarRenderer().drawTexture(matrices, xPos, yPos, 36, 18, thornsColor)
-                        else -> ArmorBarRenderer().drawTexture(matrices, xPos, yPos, 9, 18, thornsColor)
+                        count * 2 + 1 == netherites.total -> drawTexture(matrices, xPos, yPos, 18, 18, thornsColor)
+                        count * 2 + 1 < netherites.total -> drawTexture(matrices, xPos, yPos, 36, 18, thornsColor)
+                        else -> drawTexture(matrices, xPos, yPos, 9, 18, thornsColor)
                     }
                 }
                 if (count * 2 + 1 == thorns.total) {
                     if (count * 2 + 1 <= netherites.total)
-                        ArmorBarRenderer().drawTexture(matrices, xPos, yPos, 27, 18, thornsColor)
+                        drawTexture(matrices, xPos, yPos, 27, 18, thornsColor)
                     else
-                        ArmorBarRenderer().drawTexture(matrices, xPos, yPos, 0, 18, thornsColor)
+                        drawTexture(matrices, xPos, yPos, 0, 18, thornsColor)
                 }
-                if (count * 2 + 1 > thorns.total) break
+            }
+        }
+
+        //Durability Color
+        if (getConfig().options?.toggleDurability == true) {
+            var lowDur = getLowDurability(player.armorItems)
+            val lowDurColor = getLowDurabilityColor()
+            val halfArmors = ceil(playerArmor / 2.0).toInt() - 1
+            if (playerArmor != 0 && lowDur != 0) {
+                for (count in 0..halfArmors) {
+                    if (lowDur == 0) break
+
+                    val xPos = screenWidth + (halfArmors - count) * 8
+                    if (playerArmor == (halfArmors - count) * 2 + 1) {
+                        if (count == 0) {
+                            drawTexture(matrices, xPos, yPos, 18, 0, lowDurColor)
+                            lowDur--
+                        }
+                    } else {
+                        if (lowDur == 1) {
+                            drawTexture(matrices, xPos, yPos, 27, 0, lowDurColor)
+                            lowDur = 0
+                        } else {
+                            drawTexture(matrices, xPos, yPos, 9, 0, lowDurColor)
+                            lowDur -= 2
+                        }
+                    }
+                }
+            }
+
+        }
+
+        //Mending Color
+        if (getConfig().options?.toggleMending == true) {
+            val mendingTime = DetailArmorBar.getTicks() - LAST_MENDING
+            val mendingSpeed = 3
+            for (count in 0..9) {
+                if (playerArmor == 0 || mendingTime >= (mendingSpeed * 4)) break
+
+                if (mendingTime % (mendingSpeed * 2) < mendingSpeed) {
+                    val xPos = screenWidth + count * 8
+                    drawTexture(matrices, xPos, yPos, 9, 0)
+                }
             }
         }
 
@@ -243,12 +347,12 @@ class ArmorBarRenderer {
         var v = 0
         val t = (hud.ticks/3) % 36
 
-        if (DetailArmorBars.getConfig().options?.effectType == ProtectionEffectType.AURA) {
+        if (getConfig().options?.effectType == ProtectionEffectType.AURA) {
             if (t < 12) {
                 u = (t % 12) * 9
                 v = 27 + (half * 9)
             }
-        } else if (DetailArmorBars.getConfig().options?.effectType == ProtectionEffectType.OUTLINE) {
+        } else if (getConfig().options?.effectType == ProtectionEffectType.OUTLINE) {
             u = 9 + (half * 9)
         } else return
 

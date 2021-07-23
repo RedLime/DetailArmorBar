@@ -17,7 +17,7 @@
     "client": [
       {
         "adapter": "kotlin",
-        "value": "com.redlimerl.detailab.DetailArmorBars"
+        "value": "com.redlimerl.detailab.DetailArmorBar"
       }
     ],
     "modmenu": [
