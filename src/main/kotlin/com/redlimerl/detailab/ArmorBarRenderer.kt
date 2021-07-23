@@ -88,7 +88,7 @@ class ArmorBarRenderer {
                 else -> (MathHelper.lerp((time % speed) / (speed.toFloat()-1f), 0.65f, 0f)*255).roundToInt()
             }
 
-            return Color(255, 55, 55, alpha)
+            return Color(255, 25, 25, alpha)
         }
 
         private fun getThornColor(): Color {
@@ -255,9 +255,9 @@ class ArmorBarRenderer {
                         } else if (min != -1 && max == -1 && protectArr[pw] >= 1) max = pw
                     }
                     if (min != -1 && max != -1) {
-                        drawEnchantTexture(matrices, xPos, yPos, getProtectColor(protectArr), 2)
-                        protectArr[min] = 0
                         drawEnchantTexture(matrices, xPos, yPos, getProtectColor(protectArr), 1)
+                        protectArr[min] = 0
+                        drawEnchantTexture(matrices, xPos, yPos, getProtectColor(protectArr), 2)
                         protectArr[max] -= 1
                     } else {
                         drawEnchantTexture(matrices, xPos, yPos, getProtectColor(protectArr))
