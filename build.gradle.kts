@@ -35,9 +35,6 @@ dependencies {
     }
 }
 tasks {
-    withType<JavaCompile> {
-        options.encoding = "UTF-8"
-    }
     jar { from("LICENSE") { rename { "${it}_${base.archivesName}" } } }
     processResources {
         inputs.property("version", project.version)
