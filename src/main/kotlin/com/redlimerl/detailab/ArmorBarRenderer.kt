@@ -305,12 +305,12 @@ class ArmorBarRenderer {
                     val xPos = screenWidth + (halfArmors - count) * 8
                     if (playerArmor == (halfArmors - count) * 2 + 1) {
                         if (count == 0) {
-                            drawTexture(matrices, xPos, yPos, 18, 0, lowDurColor)
+                            drawTexture(matrices, xPos, yPos, 27, 0, lowDurColor)
                             lowDur--
                         }
                     } else {
                         if (lowDur == 1) {
-                            drawTexture(matrices, xPos, yPos, 27, 0, lowDurColor)
+                            drawTexture(matrices, xPos, yPos, 18, 0, lowDurColor)
                             lowDur = 0
                         } else {
                             drawTexture(matrices, xPos, yPos, 9, 0, lowDurColor)
