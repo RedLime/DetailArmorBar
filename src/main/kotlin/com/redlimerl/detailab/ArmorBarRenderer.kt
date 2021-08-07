@@ -228,7 +228,6 @@ class ArmorBarRenderer {
         val fire = getProtectLevel(player.armorItems, ProtectionEnchantment.Type.FIRE)
         val protectArr = intArrayOf(generic.total + generic.count, projectile.total, explosive.total, fire.total, 0)
         val armorMaterials = getArmorMaterials(player.armorItems.reversed())
-        println(armorMaterials.toList().joinToString { "${it.first}-${it.second.name}" })
         val thorns = getThorns(player.armorItems)
 
         val playerHealth = MathHelper.ceil(player.health)
