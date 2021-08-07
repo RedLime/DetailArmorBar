@@ -77,6 +77,17 @@ class ModConfigImpl : ModMenuApi {
                 }
                 .build())
 
+            //Armor Types
+            toggles.addEntry(entryBuilder.startBooleanToggle(TranslatableText("option.detailarmorbar.toggle.armor_types"), config.options?.toggleArmorTypes ?: true)
+                .setDefaultValue(default.toggleArmorTypes)
+                .setYesNoTextSupplier {
+                    TranslatableText("option.detailarmorbar.${if (it) "enable" else "disable"}")
+                }
+                .setSaveConsumer {
+                    config.options?.toggleArmorTypes = it
+                }
+                .build())
+
             //Netherites
             toggles.addEntry(entryBuilder.startBooleanToggle(TranslatableText("option.detailarmorbar.toggle.netherites"), config.options?.toggleNetherites ?: true)
                 .setDefaultValue(default.toggleNetherites)

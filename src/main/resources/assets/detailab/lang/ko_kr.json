@@ -19,5 +19,6 @@
   "option.detailarmorbar.toggle.netherites": "네더라이트 갑옷 게이지",
   "option.detailarmorbar.toggle.thorns": "가시 갑옷 게이지",
   "option.detailarmorbar.toggle.durability": "적은 내구도 경고",
-  "option.detailarmorbar.toggle.mending": "수선으로 갑옷이 수리될 시 효과"
+  "option.detailarmorbar.toggle.mending": "수선으로 갑옷이 수리될 시 효과",
+  "option.detailarmorbar.toggle.armor_types": "갑옷 종류별 게이지 (네더라이트 제외)"
 }

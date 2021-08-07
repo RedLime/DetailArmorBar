@@ -14,11 +14,10 @@ import net.minecraft.client.util.math.MatrixStack
 import net.minecraft.enchantment.*
 import net.minecraft.entity.attribute.EntityAttributes
 import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.item.ArmorItem
-import net.minecraft.item.ArmorMaterials
-import net.minecraft.item.ItemStack
+import net.minecraft.item.*
 import net.minecraft.util.Identifier
 import net.minecraft.util.math.MathHelper
+import net.minecraft.util.math.Matrix4f
 import net.minecraft.util.registry.Registry
 import org.apache.commons.lang3.mutable.MutableInt
 import java.awt.Color
@@ -28,7 +27,7 @@ import kotlin.math.roundToInt
 @Environment(EnvType.CLIENT)
 class ArmorBarRenderer {
 
-    data class LevelData(val total: Int, val count: Int)
+    data class LevelData(var total: Int, var count: Int)
 
     companion object {
         val INSTANCE = ArmorBarRenderer()
@@ -152,21 +151,33 @@ class ArmorBarRenderer {
             return LevelData(mutableInt.toInt(), count)
         }
 
-        private fun getNetherites(equipment: Iterable<ItemStack>): LevelData {
-            val mutableInt = MutableInt()
-            var count = 1
+        private fun getArmorMaterials(equipment: Iterable<ItemStack>): Map<Int, ArmorMaterial> {
+            var armorPoints = 0
+            val armorMaterial = hashMapOf<Int, ArmorMaterial>()
+
             for (itemStack in equipment) {
                 if (!itemStack.isEmpty) {
                     if (itemStack.item is ArmorItem) {
                         val armor = itemStack.item as ArmorItem
-                        if (armor.material == ArmorMaterials.NETHERITE) {
-                            mutableInt.add(armor.protection)
-                            count++
+                        repeat(armor.protection) {
+                            armorMaterial[armorPoints + it] = armor.material
                         }
+                        armorPoints += armor.protection
                     }
                 }
             }
-            return LevelData(mutableInt.toInt(), count)
+            return armorMaterial
+        }
+
+        private fun isElytra(equipment: Iterable<ItemStack>): Boolean {
+            for (itemStack in equipment) {
+                if (!itemStack.isEmpty) {
+                    if (itemStack.item is ElytraItem) {
+                        return true
+                    }
+                }
+            }
+            return false
         }
 
         private fun getLowDurability(equipment: Iterable<ItemStack>): Int {
@@ -182,6 +193,25 @@ class ArmorBarRenderer {
             }
             return count
         }
+
+        private fun getArmorLayerX(material: ArmorMaterial): Int {
+            val ne = getConfig().options?.toggleNetherites == true
+            val ae = getConfig().options?.toggleArmorTypes == true
+            return if (ne && material == ArmorMaterials.NETHERITE) {
+                0
+            } else if (ae) {
+                when(material) {
+                    ArmorMaterials.CHAIN -> 72
+                    ArmorMaterials.DIAMOND -> 18
+                    ArmorMaterials.GOLD -> 90
+                    ArmorMaterials.LEATHER -> 108
+                    ArmorMaterials.TURTLE -> 36
+                    else -> 54
+                }
+            } else {
+                54
+            }
+        }
     }
 
 
@@ -192,15 +222,13 @@ class ArmorBarRenderer {
     fun render(matrices: MatrixStack, player: PlayerEntity) {
         client.profiler.swap("armor")
 
-        //println(LAST_MENDING)
-
         val generic = getProtectLevel(player.armorItems, ProtectionEnchantment.Type.ALL)
         val projectile = getProtectLevel(player.armorItems, ProtectionEnchantment.Type.PROJECTILE)
         val explosive = getProtectLevel(player.armorItems, ProtectionEnchantment.Type.EXPLOSION)
         val fire = getProtectLevel(player.armorItems, ProtectionEnchantment.Type.FIRE)
-        //val protectAll = generic.count
         val protectArr = intArrayOf(generic.total + generic.count, projectile.total, explosive.total, fire.total, 0)
-        val netherites = getNetherites(player.armorItems)
+        val armorMaterials = getArmorMaterials(player.armorItems.reversed())
+        println(armorMaterials.toList().joinToString { "${it.first}-${it.second.name}" })
         val thorns = getThorns(player.armorItems)
 
         val playerHealth = MathHelper.ceil(player.health)
@@ -214,28 +242,39 @@ class ArmorBarRenderer {
         val yPos = screenHeight - (resultHealth - 1) * (10 - (resultHealth - 2)).coerceAtLeast(3) - 10
 
 
-        client.textureManager.bindTexture(GUI_ARMOR_BAR)
         RenderSystem.enableBlend()
         RenderSystem.setShader(GameRenderer::getPositionTexShader)
         RenderSystem.setShaderTexture(0, GUI_ARMOR_BAR)
-        //hud.drawTexture(matrices, 0, 0, 0, 0, 256, 256)
 
-
-        //Netherites Check
-        if (getConfig().options?.toggleNetherites == true) {
-            for (count in 0..9) {
-                if (netherites.total == 0 || count * 2 + 1 > netherites.total) break
-
+        //Default
+        for (count in 0..9) {
+            if (playerArmor > 0) {
                 val xPos = screenWidth + count * 8
-                if (count * 2 + 1 < netherites.total) {
-                    drawTexture(matrices, xPos, yPos, 9, 9)
+
+                if (count * 2 + 1 < playerArmor) {
+                    val am1 = armorMaterials.getOrDefault(count * 2, ArmorMaterials.IRON)
+                    val am2 = armorMaterials.getOrDefault(count * 2 + 1, ArmorMaterials.IRON)
+                    if (am1 == am2) {
+                        drawTexture(matrices, xPos, yPos, getArmorLayerX(am1)+9, 9)
+                    } else {
+                        drawTexture(matrices, xPos, yPos, getArmorLayerX(am1), 9)
+                        drawTexture(matrices, xPos, yPos, getArmorLayerX(am2), 9, true)
+                    }
                 }
-                if (count * 2 + 1 == netherites.total) {
-                    drawTexture(matrices, xPos, yPos, 0, 9)
+                if (count * 2 + 1 == playerArmor) {
+                    drawTexture(matrices, xPos, yPos, 45, 0)
+                    val am = armorMaterials.getOrDefault(count * 2, ArmorMaterials.IRON)
+                    drawTexture(matrices, xPos, yPos, getArmorLayerX(am), 9)
                 }
-                if (count * 2 + 1 > netherites.total) break
+                if (count * 2 + 1 > playerArmor) {
+                    if (count == 9 && isElytra(player.armorItems))
+                        drawTexture(matrices, xPos, yPos, 36, 0)
+                    else
+                        drawTexture(matrices, xPos, yPos, 45, 0)
+                }
             }
         }
+
 
         //Armor Enchantments
         if (getConfig().options?.toggleEnchants == true) {
@@ -278,17 +317,10 @@ class ArmorBarRenderer {
 
                 val xPos = screenWidth + count * 8
                 if (count * 2 + 1 < thorns.total) {
-                    when {
-                        count * 2 + 1 == netherites.total -> drawTexture(matrices, xPos, yPos, 18, 18, thornsColor)
-                        count * 2 + 1 < netherites.total -> drawTexture(matrices, xPos, yPos, 36, 18, thornsColor)
-                        else -> drawTexture(matrices, xPos, yPos, 9, 18, thornsColor)
-                    }
+                    drawTexture(matrices, xPos, yPos, 36, 18, thornsColor)
                 }
                 if (count * 2 + 1 == thorns.total) {
-                    if (count * 2 + 1 <= netherites.total)
-                        drawTexture(matrices, xPos, yPos, 27, 18, thornsColor)
-                    else
-                        drawTexture(matrices, xPos, yPos, 0, 18, thornsColor)
+                    drawTexture(matrices, xPos, yPos, 27, 18, thornsColor)
                 }
             }
         }
@@ -339,7 +371,7 @@ class ArmorBarRenderer {
 
         RenderSystem.disableBlend()
         RenderSystem.setShaderColor(1f, 1f, 1f, 1f)
-        client.textureManager.bindTexture(DrawableHelper.GUI_ICONS_TEXTURE)
+        RenderSystem.setShaderTexture(0, DrawableHelper.GUI_ICONS_TEXTURE)
     }
 
     private fun drawEnchantTexture(matrices: MatrixStack, x: Int, y: Int, color: Color, half: Int = 0) {
@@ -361,11 +393,48 @@ class ArmorBarRenderer {
 
     private fun drawTexture(matrices: MatrixStack, x: Int, y: Int, u: Int, v: Int, color: Color) {
         RenderSystem.setShaderColor(color.red/255f, color.green/255f, color.blue/255f, color.alpha/100f)
-        InGameHud.drawTexture(matrices, x, y, u.toFloat(), v.toFloat(), 9, 9, 128, 128)
+        drawTexture(matrices, x, y, u.toFloat(), v.toFloat(), 9, 9, 128, 128, false)
     }
 
-    private fun drawTexture(matrices: MatrixStack, x: Int, y: Int, u: Int, v: Int) {
+    private fun drawTexture(matrices: MatrixStack, x: Int, y: Int, u: Int, v: Int, mirror: Boolean = false) {
         RenderSystem.setShaderColor(1f, 1f, 1f, 1f)
-        InGameHud.drawTexture(matrices, x, y, u.toFloat(), v.toFloat(), 9, 9, 128, 128)
+        drawTexture(matrices, x, y, u.toFloat(), v.toFloat(), 9, 9, 128, 128, mirror)
+    }
+
+    private fun drawTexture(matrices: MatrixStack, x: Int, y: Int, u: Float, v: Float, width: Int, height: Int, textureWidth: Int, textureHeight: Int, mirror: Boolean) {
+        drawTexture(matrices, x, y, width, height, u, v, width, height, textureWidth, textureHeight, mirror)
+    }
+
+    private fun drawTexture(matrices: MatrixStack, x: Int, y: Int, width: Int, height: Int, u: Float, v: Float, regionWidth: Int, regionHeight: Int, textureWidth: Int, textureHeight: Int, mirror: Boolean) {
+        drawTexture(matrices, x, x + width, y, y + height, 0, regionWidth, regionHeight, u, v, textureWidth, textureHeight, mirror)
+    }
+
+    private fun drawTexture(matrices: MatrixStack, x0: Int, y0: Int, x1: Int, y1: Int, z: Int, regionWidth: Int, regionHeight: Int, u: Float, v: Float, textureWidth: Int, textureHeight: Int, mirror: Boolean) {
+        drawTexturedQuad(matrices.peek().model, x0, y0, x1, y1, z,
+            (u + 0.0f) / textureWidth.toFloat(),
+            (u + regionWidth.toFloat()) / textureWidth.toFloat(),
+            (v + 0.0f) / textureHeight.toFloat(),
+            (v + regionHeight.toFloat()) / textureHeight.toFloat(),
+            mirror
+        )
+    }
+
+    private fun drawTexturedQuad(matrices: Matrix4f, x0: Int, x1: Int, y0: Int, y1: Int, z: Int, u0: Float, u1: Float, v0: Float, v1: Float, mirror: Boolean) {
+        RenderSystem.setShader { GameRenderer.getPositionTexShader() }
+        val bufferBuilder = Tessellator.getInstance().buffer
+        bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE)
+        if (mirror) {
+            bufferBuilder.vertex(matrices, x0.toFloat(), y1.toFloat(), z.toFloat()).texture(u1, v1).next()
+            bufferBuilder.vertex(matrices, x1.toFloat(), y1.toFloat(), z.toFloat()).texture(u0, v1).next()
+            bufferBuilder.vertex(matrices, x1.toFloat(), y0.toFloat(), z.toFloat()).texture(u0, v0).next()
+            bufferBuilder.vertex(matrices, x0.toFloat(), y0.toFloat(), z.toFloat()).texture(u1, v0).next()
+        } else {
+            bufferBuilder.vertex(matrices, x0.toFloat(), y1.toFloat(), z.toFloat()).texture(u0, v1).next()
+            bufferBuilder.vertex(matrices, x1.toFloat(), y1.toFloat(), z.toFloat()).texture(u1, v1).next()
+            bufferBuilder.vertex(matrices, x1.toFloat(), y0.toFloat(), z.toFloat()).texture(u1, v0).next()
+            bufferBuilder.vertex(matrices, x0.toFloat(), y0.toFloat(), z.toFloat()).texture(u0, v0).next()
+        }
+        bufferBuilder.end()
+        BufferRenderer.draw(bufferBuilder)
     }
 }

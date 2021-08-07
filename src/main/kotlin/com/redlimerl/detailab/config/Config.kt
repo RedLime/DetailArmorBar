@@ -51,6 +51,7 @@ class Config(private val file: File) {
 
         var toggleEnchants = true
         var toggleNetherites = true
+        var toggleArmorTypes = true
         var toggleThorns = true
         var toggleDurability = true
         var toggleMending = true
