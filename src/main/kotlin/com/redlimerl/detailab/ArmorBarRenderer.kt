@@ -180,7 +180,7 @@ class ArmorBarRenderer {
             return false
         }
 
-        private fun getLowDurability(equipment: Iterable<ItemStack>): Int {
+        private fun getLowDurabilityArmor(equipment: Iterable<ItemStack>): Int {
             var count = 0
             for (itemStack in equipment) {
                 if (!itemStack.isEmpty) {
@@ -192,6 +192,19 @@ class ArmorBarRenderer {
                 }
             }
             return count
+        }
+
+        private fun isLowDurabilityElytra(equipment: Iterable<ItemStack>): Boolean {
+            for (itemStack in equipment) {
+                if (!itemStack.isEmpty) {
+                    if (itemStack.item is ElytraItem) {
+                        if ((itemStack.damage.toFloat() / itemStack.maxDamage * 100f) > 92f) {
+                            return true
+                        }
+                    }
+                }
+            }
+            return false
         }
 
         private fun getArmorLayerX(material: ArmorMaterial): Int {
@@ -271,6 +284,9 @@ class ArmorBarRenderer {
                     else
                         drawTexture(matrices, xPos, yPos, 45, 0)
                 }
+            } else {
+                if (isElytra(player.armorItems))
+                    drawTexture(matrices, screenWidth, yPos, 36, 0)
             }
         }
 
@@ -326,7 +342,7 @@ class ArmorBarRenderer {
 
         //Durability Color
         if (getConfig().options?.toggleDurability == true) {
-            var lowDur = getLowDurability(player.armorItems)
+            var lowDur = getLowDurabilityArmor(player.armorItems)
             val lowDurColor = getLowDurabilityColor()
             val halfArmors = ceil(playerArmor / 2.0).toInt() - 1
             if (playerArmor != 0 && lowDur != 0) {
@@ -350,6 +366,10 @@ class ArmorBarRenderer {
                     }
                 }
             }
+            if (isLowDurabilityElytra(player.armorItems)) {
+                val xPos = screenWidth + 9 * 8
+                drawTexture(matrices, if (playerArmor > 0) xPos else screenWidth, yPos, 54, 0, lowDurColor)
+            }
 
         }
 
@@ -358,11 +378,18 @@ class ArmorBarRenderer {
             val mendingTime = DetailArmorBar.getTicks() - LAST_MENDING
             val mendingSpeed = 3
             for (count in 0..9) {
-                if (playerArmor == 0 || mendingTime >= (mendingSpeed * 4)) break
+                if (playerArmor == 0 || mendingTime >= (mendingSpeed * 4)) {
+                    if (isElytra(player.armorItems)) drawTexture(matrices, screenWidth, yPos, 54, 0)
+                    break
+                }
 
                 if (mendingTime % (mendingSpeed * 2) < mendingSpeed) {
                     val xPos = screenWidth + count * 8
-                    drawTexture(matrices, xPos, yPos, 9, 0)
+                    if (count == 9 && isElytra(player.armorItems)) {
+                        drawTexture(matrices, xPos, yPos, 54, 0)
+                    } else {
+                        drawTexture(matrices, xPos, yPos, 9, 0)
+                    }
                 }
             }
         }
