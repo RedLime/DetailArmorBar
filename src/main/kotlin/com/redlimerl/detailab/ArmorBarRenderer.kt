@@ -379,7 +379,7 @@ class ArmorBarRenderer {
             val mendingSpeed = 3
             for (count in 0..9) {
                 if (playerArmor == 0 || mendingTime >= (mendingSpeed * 4)) {
-                    if (isElytra(player.armorItems)) drawTexture(matrices, screenWidth, yPos, 54, 0)
+                    if (isElytra(player.armorItems) && mendingTime < (mendingSpeed * 4) && mendingTime % (mendingSpeed * 2) < mendingSpeed) drawTexture(matrices, screenWidth, yPos, 54, 0)
                     break
                 }
 
