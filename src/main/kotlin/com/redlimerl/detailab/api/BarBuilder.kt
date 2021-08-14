@@ -6,7 +6,6 @@ import com.redlimerl.detailab.item.CustomArmors
 import net.minecraft.item.ArmorItem
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
-import net.minecraft.item.Wearable
 import net.minecraft.util.registry.Registry
 import org.apache.logging.log4j.Level
 
@@ -63,7 +62,6 @@ class ItemBarBuilder {
      * @throws IllegalStateException If [item] is not Wearable, an error occurs.
      */
     fun item(item: Item): ItemBarBuilder {
-        if (item !is Wearable) throw IllegalStateException("It isn't Wearable Item")
         this.item = item
         return this
     }
@@ -85,7 +83,6 @@ class ItemBarBuilder {
      */
     fun register() {
         try {
-            if (item !is Wearable) throw IllegalStateException("It isn't Wearable Item")
             CustomArmors.itemList[item] = CustomArmorBar(predicate)
             DetailArmorBar.LOGGER.log(Level.INFO, "Successfully registered '${Registry.ITEM.getId(item)}'!")
         } catch (e: UninitializedPropertyAccessException) {
