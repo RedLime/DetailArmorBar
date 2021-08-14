@@ -55,6 +55,8 @@ class Config(private val file: File) {
         var toggleThorns = true
         var toggleDurability = true
         var toggleMending = true
+        var toggleEmptyBar = true
+        var toggleItemBar = true
 
         fun replaceInvalidOptions(options: Options): Boolean {
             var invalid = false

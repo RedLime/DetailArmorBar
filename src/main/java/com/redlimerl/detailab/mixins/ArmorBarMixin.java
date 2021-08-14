@@ -1,6 +1,6 @@
 package com.redlimerl.detailab.mixins;
 
-import com.redlimerl.detailab.ArmorBarRenderer;
+import com.redlimerl.detailab.render.ArmorBarRenderer;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.client.util.math.MatrixStack;

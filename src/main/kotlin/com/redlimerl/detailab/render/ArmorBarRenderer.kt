@@ -1,26 +1,37 @@
 @file:Suppress("SameParameterValue")
 
-package com.redlimerl.detailab
+package com.redlimerl.detailab.render
 
 import com.mojang.blaze3d.systems.RenderSystem
+import com.redlimerl.detailab.AnimationType
+import com.redlimerl.detailab.DetailArmorBar
+import com.redlimerl.detailab.DetailArmorBar.GUI_ARMOR_BAR
 import com.redlimerl.detailab.DetailArmorBar.getConfig
+import com.redlimerl.detailab.EffectSpeedType
+import com.redlimerl.detailab.ProtectionEffectType
+import com.redlimerl.detailab.item.CustomArmorBar
+import com.redlimerl.detailab.item.CustomArmors
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.gui.DrawableHelper
 import net.minecraft.client.gui.hud.InGameHud
-import net.minecraft.client.render.*
+import net.minecraft.client.render.GameRenderer
 import net.minecraft.client.util.math.MatrixStack
-import net.minecraft.enchantment.*
+import net.minecraft.enchantment.Enchantment
+import net.minecraft.enchantment.EnchantmentHelper
+import net.minecraft.enchantment.ProtectionEnchantment
+import net.minecraft.enchantment.ThornsEnchantment
 import net.minecraft.entity.attribute.EntityAttributes
 import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.item.*
-import net.minecraft.util.Identifier
+import net.minecraft.item.ArmorItem
+import net.minecraft.item.ArmorMaterials
+import net.minecraft.item.ItemStack
 import net.minecraft.util.math.MathHelper
-import net.minecraft.util.math.Matrix4f
 import net.minecraft.util.registry.Registry
 import org.apache.commons.lang3.mutable.MutableInt
 import java.awt.Color
+import java.lang.Integer.min
 import kotlin.math.ceil
 import kotlin.math.roundToInt
 
@@ -31,7 +42,6 @@ class ArmorBarRenderer {
 
     companion object {
         val INSTANCE = ArmorBarRenderer()
-        val GUI_ARMOR_BAR = Identifier(DetailArmorBar.MOD_ID, "textures/armor_bar.png")
         var LAST_THORNS = 0L
         var LAST_MENDING = 0L
 
@@ -66,7 +76,7 @@ class ArmorBarRenderer {
 
             return when {
                 g > 0 -> Color(153, 255, 255, alpha)
-                p > 0 -> Color(153, 153, 255, alpha)
+                p > 0 -> Color(112, 51, 173, alpha)
                 e > 0 -> Color(255, 255, 0, alpha)
                 f > 0 -> Color(210, 56, 0, alpha)
                 a > 0 -> Color(255, 255, 255, alpha)
@@ -151,79 +161,57 @@ class ArmorBarRenderer {
             return LevelData(mutableInt.toInt(), count)
         }
 
-        private fun getArmorMaterials(equipment: Iterable<ItemStack>): Map<Int, ArmorMaterial> {
-            var armorPoints = 0
-            val armorMaterial = hashMapOf<Int, ArmorMaterial>()
-
-            for (itemStack in equipment) {
-                if (!itemStack.isEmpty) {
-                    if (itemStack.item is ArmorItem) {
-                        val armor = itemStack.item as ArmorItem
-                        repeat(armor.protection) {
-                            armorMaterial[armorPoints + it] = armor.material
-                        }
-                        armorPoints += armor.protection
-                    }
-                }
-            }
-            return armorMaterial
-        }
-
-        private fun isElytra(equipment: Iterable<ItemStack>): Boolean {
-            for (itemStack in equipment) {
-                if (!itemStack.isEmpty) {
-                    if (itemStack.item is ElytraItem) {
-                        return true
-                    }
-                }
-            }
-            return false
-        }
-
-        private fun getLowDurabilityArmor(equipment: Iterable<ItemStack>): Int {
+        private fun getLowDurabilityItem(equipment: Iterable<ItemStack>): Int {
             var count = 0
             for (itemStack in equipment) {
                 if (!itemStack.isEmpty) {
-                    if (itemStack.item is ArmorItem) {
-                        if ((itemStack.damage.toFloat() / itemStack.maxDamage * 100f) > 92f) {
-                            count += (itemStack.item as ArmorItem).protection
-                        }
+                    if (itemStack.maxDamage != 0 && (itemStack.damage.toFloat() / itemStack.maxDamage * 100f) > 92f) {
+                        count += (itemStack.item as? ArmorItem)?.protection ?: 2
                     }
                 }
             }
             return count
         }
 
-        private fun isLowDurabilityElytra(equipment: Iterable<ItemStack>): Boolean {
+        private fun getArmorPoints(equipment: Iterable<ItemStack>): Map<Int, Pair<ItemStack, CustomArmorBar>> {
+            var armorPoints = 0
+            val armorItem = hashMapOf<Int, Pair<ItemStack, CustomArmorBar>>()
+
             for (itemStack in equipment) {
                 if (!itemStack.isEmpty) {
-                    if (itemStack.item is ElytraItem) {
-                        if ((itemStack.damage.toFloat() / itemStack.maxDamage * 100f) > 92f) {
-                            return true
+                    if (CustomArmors.armorList.containsKey(itemStack.item)) {
+                        val armor = itemStack.item as ArmorItem
+                        val barData = if (getConfig().options?.toggleArmorTypes == true) {
+                            CustomArmors.armorList[itemStack.item] ?: continue
+                        } else {
+                            if (getConfig().options?.toggleNetherites == true && armor.material == ArmorMaterials.NETHERITE) {
+                                CustomArmors.armorList[itemStack.item] ?: continue
+                            } else {
+                                CustomArmorBar.DEFAULT
+                            }
+                        }
+                        repeat(armor.protection) {
+                            armorItem[armorPoints + it] = Pair(itemStack, barData)
+                        }
+                        armorPoints += armor.protection
+                    }
+                }
+            }
+            if (getConfig().options?.toggleItemBar == true) {
+                for (itemStack in equipment) {
+                    if (!itemStack.isEmpty) {
+                        if (CustomArmors.itemList.containsKey(itemStack.item)) {
+                            if (armorPoints % 2 == 1)
+                                armorItem[armorPoints++] = Pair(ItemStack.EMPTY, CustomArmorBar.EMPTY)
+
+                            val barData = CustomArmors.itemList[itemStack.item] ?: continue
+                            armorItem[armorPoints++] = Pair(itemStack, barData)
+                            armorItem[armorPoints++] = Pair(itemStack, barData)
                         }
                     }
                 }
             }
-            return false
-        }
-
-        private fun getArmorLayerX(material: ArmorMaterial): Int {
-            val ne = getConfig().options?.toggleNetherites == true
-            val ae = getConfig().options?.toggleArmorTypes == true
-            return if (ne && material == ArmorMaterials.NETHERITE) {
-                0
-            } else if (ae) {
-                when(material) {
-                    ArmorMaterials.CHAIN -> 72
-                    ArmorMaterials.DIAMOND -> 18
-                    ArmorMaterials.GOLD -> 90
-                    ArmorMaterials.LEATHER -> 108
-                    ArmorMaterials.TURTLE -> 36
-                    else -> 54
-                }
-            } else {
-                54
-            }
+            return armorItem
         }
     }
 
@@ -240,11 +228,11 @@ class ArmorBarRenderer {
         val explosive = getProtectLevel(player.armorItems, ProtectionEnchantment.Type.EXPLOSION)
         val fire = getProtectLevel(player.armorItems, ProtectionEnchantment.Type.FIRE)
         val protectArr = intArrayOf(generic.total + generic.count, projectile.total, explosive.total, fire.total, 0)
-        val armorMaterials = getArmorMaterials(player.armorItems.reversed())
+        val armorPoints = getArmorPoints(player.armorItems.reversed())
         val thorns = getThorns(player.armorItems)
 
         val playerHealth = MathHelper.ceil(player.health)
-        val playerArmor = player.armor
+        val playerArmor = min(armorPoints.size, 20)
         val totalEnchants = protectArr.sum()
         val maxHealth = player.getAttributeValue(EntityAttributes.GENERIC_MAX_HEALTH).toFloat().coerceAtLeast(playerHealth.toFloat())
         val absorptionHealth = MathHelper.ceil(player.absorptionAmount)
@@ -256,7 +244,6 @@ class ArmorBarRenderer {
 
         RenderSystem.enableBlend()
         RenderSystem.setShader(GameRenderer::getPositionTexShader)
-        RenderSystem.setShaderTexture(0, GUI_ARMOR_BAR)
 
         //Default
         for (count in 0..9) {
@@ -264,32 +251,72 @@ class ArmorBarRenderer {
                 val xPos = screenWidth + count * 8
 
                 if (count * 2 + 1 < playerArmor) {
-                    val am1 = armorMaterials.getOrDefault(count * 2, ArmorMaterials.IRON)
-                    val am2 = armorMaterials.getOrDefault(count * 2 + 1, ArmorMaterials.IRON)
+                    val am1 = armorPoints.getOrDefault(count * 2, Pair(ItemStack.EMPTY, CustomArmorBar.DEFAULT))
+                    val am2 = armorPoints.getOrDefault(count * 2 + 1, Pair(ItemStack.EMPTY, CustomArmorBar.DEFAULT))
                     if (am1 == am2) {
-                        drawTexture(matrices, xPos, yPos, getArmorLayerX(am1)+9, 9)
+                        am1.second.draw(am1.first, matrices, xPos, yPos, false, isMirror = false)
                     } else {
-                        drawTexture(matrices, xPos, yPos, getArmorLayerX(am1), 9)
-                        drawTexture(matrices, xPos, yPos, getArmorLayerX(am2), 9, true)
+                        am2.second.draw(am2.first, matrices, xPos, yPos, true, isMirror = true)
+                        am1.second.draw(am1.first, matrices, xPos, yPos, true, isMirror = false)
                     }
                 }
                 if (count * 2 + 1 == playerArmor) {
-                    drawTexture(matrices, xPos, yPos, 45, 0)
-                    val am = armorMaterials.getOrDefault(count * 2, ArmorMaterials.IRON)
-                    drawTexture(matrices, xPos, yPos, getArmorLayerX(am), 9)
+                    CustomArmorBar.EMPTY.draw(ItemStack.EMPTY, matrices, xPos, yPos, false, isMirror = false)
+                    val am = armorPoints.getOrDefault(count * 2, Pair(ItemStack.EMPTY, CustomArmorBar.DEFAULT))
+                    am.second.draw(am.first, matrices, xPos, yPos, true, isMirror = false)
                 }
                 if (count * 2 + 1 > playerArmor) {
-                    if (count == 9 && isElytra(player.armorItems))
-                        drawTexture(matrices, xPos, yPos, 36, 0)
-                    else
-                        drawTexture(matrices, xPos, yPos, 45, 0)
+                    CustomArmorBar.EMPTY.draw(ItemStack.EMPTY, matrices, xPos, yPos, false, isMirror = false)
                 }
-            } else {
-                if (isElytra(player.armorItems))
-                    drawTexture(matrices, screenWidth, yPos, 36, 0)
             }
         }
 
+        //Durability Color
+        if (getConfig().options?.toggleDurability == true) {
+            var lowDur = getLowDurabilityItem(player.armorItems)
+            val lowDurColor = getLowDurabilityColor()
+            val halfArmors = ceil(playerArmor / 2.0).toInt() - 1
+            if (playerArmor != 0 && lowDur != 0) {
+                for (count in 0..halfArmors) {
+                    if (lowDur == 0) break
+
+                    val xPos = screenWidth + (halfArmors - count) * 8
+                    val am = armorPoints.getOrDefault((halfArmors - count) * 2, Pair(ItemStack.EMPTY, CustomArmorBar.DEFAULT))
+                    if (playerArmor == (halfArmors - count) * 2 + 1) {
+                        if (count == 0) {
+                            am.second.drawOutLine(am.first, matrices, xPos, yPos, true, isMirror = false, lowDurColor)
+                            lowDur--
+                        }
+                    } else {
+                        if (lowDur == 1) {
+                            am.second.drawOutLine(am.first, matrices, xPos, yPos, true, isMirror = true, lowDurColor)
+                            lowDur = 0
+                        } else {
+                            am.second.drawOutLine(am.first, matrices, xPos, yPos, false, isMirror = false, lowDurColor)
+                            lowDur -= 2
+                        }
+                    }
+                }
+            }
+        }
+
+        //Mending Color
+        if (getConfig().options?.toggleMending == true) {
+            val mendingTime = DetailArmorBar.getTicks() - LAST_MENDING
+            val mendingSpeed = 3
+            for (count in 0..9) {
+                if (playerArmor == 0 || mendingTime >= (mendingSpeed * 4)) break
+
+                if (mendingTime % (mendingSpeed * 2) < mendingSpeed) {
+                    val xPos = screenWidth + count * 8
+
+                    val am = armorPoints.getOrDefault(count * 2, Pair(ItemStack.EMPTY, CustomArmorBar.EMPTY))
+                    am.second.drawOutLine(am.first, matrices, xPos, yPos, false, isMirror = false, Color.WHITE)
+                }
+            }
+        }
+
+        RenderSystem.setShaderTexture(0, GUI_ARMOR_BAR)
 
         //Armor Enchantments
         if (getConfig().options?.toggleEnchants == true) {
@@ -332,64 +359,10 @@ class ArmorBarRenderer {
 
                 val xPos = screenWidth + count * 8
                 if (count * 2 + 1 < thorns.total) {
-                    drawTexture(matrices, xPos, yPos, 36, 18, thornsColor)
+                    InGameDrawer.drawTexture(matrices, xPos, yPos, 36, 18, thornsColor)
                 }
                 if (count * 2 + 1 == thorns.total) {
-                    drawTexture(matrices, xPos, yPos, 27, 18, thornsColor)
-                }
-            }
-        }
-
-        //Durability Color
-        if (getConfig().options?.toggleDurability == true) {
-            var lowDur = getLowDurabilityArmor(player.armorItems)
-            val lowDurColor = getLowDurabilityColor()
-            val halfArmors = ceil(playerArmor / 2.0).toInt() - 1
-            if (playerArmor != 0 && lowDur != 0) {
-                for (count in 0..halfArmors) {
-                    if (lowDur == 0) break
-
-                    val xPos = screenWidth + (halfArmors - count) * 8
-                    if (playerArmor == (halfArmors - count) * 2 + 1) {
-                        if (count == 0) {
-                            drawTexture(matrices, xPos, yPos, 27, 0, lowDurColor)
-                            lowDur--
-                        }
-                    } else {
-                        if (lowDur == 1) {
-                            drawTexture(matrices, xPos, yPos, 18, 0, lowDurColor)
-                            lowDur = 0
-                        } else {
-                            drawTexture(matrices, xPos, yPos, 9, 0, lowDurColor)
-                            lowDur -= 2
-                        }
-                    }
-                }
-            }
-            if (isLowDurabilityElytra(player.armorItems)) {
-                val xPos = screenWidth + 9 * 8
-                drawTexture(matrices, if (playerArmor > 0) xPos else screenWidth, yPos, 54, 0, lowDurColor)
-            }
-
-        }
-
-        //Mending Color
-        if (getConfig().options?.toggleMending == true) {
-            val mendingTime = DetailArmorBar.getTicks() - LAST_MENDING
-            val mendingSpeed = 3
-            for (count in 0..9) {
-                if (playerArmor == 0 || mendingTime >= (mendingSpeed * 4)) {
-                    if (isElytra(player.armorItems) && mendingTime < (mendingSpeed * 4) && mendingTime % (mendingSpeed * 2) < mendingSpeed) drawTexture(matrices, screenWidth, yPos, 54, 0)
-                    break
-                }
-
-                if (mendingTime % (mendingSpeed * 2) < mendingSpeed) {
-                    val xPos = screenWidth + count * 8
-                    if (count == 9 && isElytra(player.armorItems)) {
-                        drawTexture(matrices, xPos, yPos, 54, 0)
-                    } else {
-                        drawTexture(matrices, xPos, yPos, 9, 0)
-                    }
+                    InGameDrawer.drawTexture(matrices, xPos, yPos, 27, 18, thornsColor)
                 }
             }
         }
@@ -414,53 +387,6 @@ class ArmorBarRenderer {
             u = 9 + (half * 9)
         } else return
 
-        drawTexture(matrices, x, y, u, v, color)
-    }
-
-    private fun drawTexture(matrices: MatrixStack, x: Int, y: Int, u: Int, v: Int, color: Color) {
-        RenderSystem.setShaderColor(color.red/255f, color.green/255f, color.blue/255f, color.alpha/100f)
-        drawTexture(matrices, x, y, u.toFloat(), v.toFloat(), 9, 9, 128, 128, false)
-    }
-
-    private fun drawTexture(matrices: MatrixStack, x: Int, y: Int, u: Int, v: Int, mirror: Boolean = false) {
-        RenderSystem.setShaderColor(1f, 1f, 1f, 1f)
-        drawTexture(matrices, x, y, u.toFloat(), v.toFloat(), 9, 9, 128, 128, mirror)
-    }
-
-    private fun drawTexture(matrices: MatrixStack, x: Int, y: Int, u: Float, v: Float, width: Int, height: Int, textureWidth: Int, textureHeight: Int, mirror: Boolean) {
-        drawTexture(matrices, x, y, width, height, u, v, width, height, textureWidth, textureHeight, mirror)
-    }
-
-    private fun drawTexture(matrices: MatrixStack, x: Int, y: Int, width: Int, height: Int, u: Float, v: Float, regionWidth: Int, regionHeight: Int, textureWidth: Int, textureHeight: Int, mirror: Boolean) {
-        drawTexture(matrices, x, x + width, y, y + height, 0, regionWidth, regionHeight, u, v, textureWidth, textureHeight, mirror)
-    }
-
-    private fun drawTexture(matrices: MatrixStack, x0: Int, y0: Int, x1: Int, y1: Int, z: Int, regionWidth: Int, regionHeight: Int, u: Float, v: Float, textureWidth: Int, textureHeight: Int, mirror: Boolean) {
-        drawTexturedQuad(matrices.peek().model, x0, y0, x1, y1, z,
-            (u + 0.0f) / textureWidth.toFloat(),
-            (u + regionWidth.toFloat()) / textureWidth.toFloat(),
-            (v + 0.0f) / textureHeight.toFloat(),
-            (v + regionHeight.toFloat()) / textureHeight.toFloat(),
-            mirror
-        )
-    }
-
-    private fun drawTexturedQuad(matrices: Matrix4f, x0: Int, x1: Int, y0: Int, y1: Int, z: Int, u0: Float, u1: Float, v0: Float, v1: Float, mirror: Boolean) {
-        RenderSystem.setShader { GameRenderer.getPositionTexShader() }
-        val bufferBuilder = Tessellator.getInstance().buffer
-        bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE)
-        if (mirror) {
-            bufferBuilder.vertex(matrices, x0.toFloat(), y1.toFloat(), z.toFloat()).texture(u1, v1).next()
-            bufferBuilder.vertex(matrices, x1.toFloat(), y1.toFloat(), z.toFloat()).texture(u0, v1).next()
-            bufferBuilder.vertex(matrices, x1.toFloat(), y0.toFloat(), z.toFloat()).texture(u0, v0).next()
-            bufferBuilder.vertex(matrices, x0.toFloat(), y0.toFloat(), z.toFloat()).texture(u1, v0).next()
-        } else {
-            bufferBuilder.vertex(matrices, x0.toFloat(), y1.toFloat(), z.toFloat()).texture(u0, v1).next()
-            bufferBuilder.vertex(matrices, x1.toFloat(), y1.toFloat(), z.toFloat()).texture(u1, v1).next()
-            bufferBuilder.vertex(matrices, x1.toFloat(), y0.toFloat(), z.toFloat()).texture(u1, v0).next()
-            bufferBuilder.vertex(matrices, x0.toFloat(), y0.toFloat(), z.toFloat()).texture(u0, v0).next()
-        }
-        bufferBuilder.end()
-        BufferRenderer.draw(bufferBuilder)
+        InGameDrawer.drawTexture(matrices, x, y, u, v, color)
     }
 }

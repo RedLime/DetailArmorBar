@@ -1,16 +1,13 @@
 package com.redlimerl.detailab.mixins;
 
-import com.redlimerl.detailab.ArmorBarRenderer;
 import com.redlimerl.detailab.DetailArmorBar;
+import com.redlimerl.detailab.render.ArmorBarRenderer;
 import net.minecraft.enchantment.ThornsEnchantment;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ThornsEnchantment.class)
 public class ThornsEnchantmentMixin {

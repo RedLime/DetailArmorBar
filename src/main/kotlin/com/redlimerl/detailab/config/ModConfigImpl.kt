@@ -7,7 +7,6 @@ import com.redlimerl.detailab.ProtectionEffectType
 import com.terraformersmc.modmenu.api.ConfigScreenFactory
 import com.terraformersmc.modmenu.api.ModMenuApi
 import me.shedaniel.clothconfig2.api.ConfigBuilder
-import me.shedaniel.clothconfig2.impl.builders.DropdownMenuBuilder
 import net.minecraft.client.gui.screen.Screen
 import net.minecraft.text.TranslatableText
 import java.util.*
@@ -96,6 +95,28 @@ class ModConfigImpl : ModMenuApi {
                 }
                 .setSaveConsumer {
                     config.options?.toggleNetherites = it
+                }
+                .build())
+
+            //Empty Bar
+            toggles.addEntry(entryBuilder.startBooleanToggle(TranslatableText("option.detailarmorbar.toggle.empty_bar"), config.options?.toggleEmptyBar ?: true)
+                .setDefaultValue(default.toggleEmptyBar)
+                .setYesNoTextSupplier {
+                    TranslatableText("option.detailarmorbar.${if (it) "enable" else "disable"}")
+                }
+                .setSaveConsumer {
+                    config.options?.toggleEmptyBar = it
+                }
+                .build())
+
+            //Item Bar
+            toggles.addEntry(entryBuilder.startBooleanToggle(TranslatableText("option.detailarmorbar.toggle.item_types"), config.options?.toggleItemBar ?: true)
+                .setDefaultValue(default.toggleItemBar)
+                .setYesNoTextSupplier {
+                    TranslatableText("option.detailarmorbar.${if (it) "enable" else "disable"}")
+                }
+                .setSaveConsumer {
+                    config.options?.toggleItemBar = it
                 }
                 .build())
 

@@ -20,5 +20,7 @@
   "option.detailarmorbar.toggle.thorns": "Toggle Thorns Armor Bar",
   "option.detailarmorbar.toggle.durability": "Toggle Low Durability Effect",
   "option.detailarmorbar.toggle.mending": "Toggle Repair Effect by Mending",
-  "option.detailarmorbar.toggle.armor_types": "Toggle Armor Type Bar (w/o Netherite)"
+  "option.detailarmorbar.toggle.armor_types": "Toggle Armor Type Bar (w/o Netherite)",
+  "option.detailarmorbar.toggle.item_types": "Toggle Item Type Bar (like Elytra)",
+  "option.detailarmorbar.toggle.empty_bar": "Toggle Empty Armor Bar"
 }

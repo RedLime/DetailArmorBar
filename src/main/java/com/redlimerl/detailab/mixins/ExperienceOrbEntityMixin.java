@@ -1,7 +1,7 @@
 package com.redlimerl.detailab.mixins;
 
-import com.redlimerl.detailab.ArmorBarRenderer;
 import com.redlimerl.detailab.DetailArmorBar;
+import com.redlimerl.detailab.render.ArmorBarRenderer;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.ExperienceOrbEntity;
 import net.minecraft.item.ItemStack;
