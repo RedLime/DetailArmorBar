@@ -253,7 +253,7 @@ class ArmorBarRenderer {
                 if (count * 2 + 1 < playerArmor) {
                     val am1 = armorPoints.getOrDefault(count * 2, Pair(ItemStack.EMPTY, CustomArmorBar.DEFAULT))
                     val am2 = armorPoints.getOrDefault(count * 2 + 1, Pair(ItemStack.EMPTY, CustomArmorBar.DEFAULT))
-                    if (am1 == am2) {
+                    if (am1 == am2 || (am1.first.item is ArmorItem && (am1.first.item as? ArmorItem)?.material == (am2.first.item as? ArmorItem)?.material)) {
                         am1.second.draw(am1.first, matrices, xPos, yPos, false, isMirror = false)
                     } else {
                         am2.second.draw(am2.first, matrices, xPos, yPos, true, isMirror = true)
