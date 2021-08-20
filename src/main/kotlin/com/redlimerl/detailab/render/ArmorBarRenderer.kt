@@ -178,33 +178,34 @@ class ArmorBarRenderer {
             val armorItem = hashMapOf<Int, Pair<ItemStack, CustomArmorBar>>()
             val equipment = player.armorItems.reversed()
 
-            for (itemStack in equipment) {
-                if (!itemStack.isEmpty) {
-                    val armor = itemStack.item as ArmorItem
-                    val attributes = itemStack.getAttributeModifiers(armor.slotType)
-                    val barData = if (getConfig().options?.toggleArmorTypes == true) {
+            repeat(player.attributes.getBaseValue(EntityAttributes.GENERIC_ARMOR).toInt()) {
+                armorItem[armorPoints++] = Pair(ItemStack.EMPTY, CustomArmorBar.DEFAULT)
+            }
+            for (itemStack in equipment.filter { !it.isEmpty && it.item is ArmorItem }) {
+                val armor = itemStack.item as ArmorItem
+                val attributes = itemStack.getAttributeModifiers(armor.slotType)
+                val barData = if (getConfig().options?.toggleArmorTypes == true) {
+                    CustomArmors.armorList.getOrDefault(itemStack.item, CustomArmorBar.DEFAULT)
+                } else {
+                    if (getConfig().options?.toggleNetherites == true && armor.material == ArmorMaterials.NETHERITE) {
                         CustomArmors.armorList.getOrDefault(itemStack.item, CustomArmorBar.DEFAULT)
                     } else {
-                        if (getConfig().options?.toggleNetherites == true && armor.material == ArmorMaterials.NETHERITE) {
-                            CustomArmors.armorList.getOrDefault(itemStack.item, CustomArmorBar.DEFAULT)
-                        } else {
-                            CustomArmorBar.DEFAULT
-                        }
+                        CustomArmorBar.DEFAULT
                     }
-                    if (attributes.containsKey(EntityAttributes.GENERIC_ARMOR)) {
-                        val b = attributes.get(EntityAttributes.GENERIC_ARMOR).map { it.value }.sum().toInt()
-                        repeat(b) {
-                            armorItem[armorPoints++] = Pair(itemStack, barData)
-                        }
-                    } else {
-                        repeat(armor.protection) {
-                            armorItem[armorPoints++] = Pair(itemStack, barData)
-                        }
+                }
+                if (attributes.containsKey(EntityAttributes.GENERIC_ARMOR)) {
+                    val b = attributes.get(EntityAttributes.GENERIC_ARMOR).map { it.value }.sum().toInt()
+                    repeat(b) {
+                        armorItem[armorPoints++] = Pair(itemStack, barData)
+                    }
+                } else {
+                    repeat(armor.protection) {
+                        armorItem[armorPoints++] = Pair(itemStack, barData)
                     }
                 }
             }
             if (getConfig().options?.toggleItemBar == true) {
-                for (itemStack in equipment) {
+                for (itemStack in equipment.filter { !it.isEmpty && !(it.item is ArmorItem) }) {
                     if (!itemStack.isEmpty) {
                         if (CustomArmors.itemList.containsKey(itemStack.item)) {
                             if (armorPoints % 2 == 1)
@@ -216,9 +217,6 @@ class ArmorBarRenderer {
                         }
                     }
                 }
-            }
-            repeat(player.attributes.getBaseValue(EntityAttributes.GENERIC_ARMOR).toInt()) {
-                armorItem[armorPoints++] = Pair(ItemStack.EMPTY, CustomArmorBar.DEFAULT)
             }
             return armorItem
         }
