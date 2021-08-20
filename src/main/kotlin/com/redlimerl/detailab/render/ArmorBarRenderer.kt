@@ -181,6 +181,7 @@ class ArmorBarRenderer {
                 if (!itemStack.isEmpty) {
                     if (CustomArmors.armorList.containsKey(itemStack.item)) {
                         val armor = itemStack.item as ArmorItem
+                        val attributes = itemStack.getAttributeModifiers(armor.slotType)
                         val barData = if (getConfig().options?.toggleArmorTypes == true) {
                             CustomArmors.armorList[itemStack.item] ?: continue
                         } else {
@@ -190,10 +191,11 @@ class ArmorBarRenderer {
                                 CustomArmorBar.DEFAULT
                             }
                         }
-                        repeat(armor.protection) {
+                        val b = attributes.get(EntityAttributes.GENERIC_ARMOR).map { it.value }.sum().toInt()
+                        repeat(b) {
                             armorItem[armorPoints + it] = Pair(itemStack, barData)
                         }
-                        armorPoints += armor.protection
+                        armorPoints += b
                     }
                 }
             }
