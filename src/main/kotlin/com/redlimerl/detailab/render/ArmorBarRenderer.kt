@@ -173,29 +173,33 @@ class ArmorBarRenderer {
             return count
         }
 
-        private fun getArmorPoints(equipment: Iterable<ItemStack>): Map<Int, Pair<ItemStack, CustomArmorBar>> {
+        private fun getArmorPoints(player: PlayerEntity): Map<Int, Pair<ItemStack, CustomArmorBar>> {
             var armorPoints = 0
             val armorItem = hashMapOf<Int, Pair<ItemStack, CustomArmorBar>>()
+            val equipment = player.armorItems.reversed()
 
             for (itemStack in equipment) {
                 if (!itemStack.isEmpty) {
-                    if (CustomArmors.armorList.containsKey(itemStack.item)) {
-                        val armor = itemStack.item as ArmorItem
-                        val attributes = itemStack.getAttributeModifiers(armor.slotType)
-                        val barData = if (getConfig().options?.toggleArmorTypes == true) {
-                            CustomArmors.armorList[itemStack.item] ?: continue
+                    val armor = itemStack.item as ArmorItem
+                    val attributes = itemStack.getAttributeModifiers(armor.slotType)
+                    val barData = if (getConfig().options?.toggleArmorTypes == true) {
+                        CustomArmors.armorList.getOrDefault(itemStack.item, CustomArmorBar.DEFAULT)
+                    } else {
+                        if (getConfig().options?.toggleNetherites == true && armor.material == ArmorMaterials.NETHERITE) {
+                            CustomArmors.armorList.getOrDefault(itemStack.item, CustomArmorBar.DEFAULT)
                         } else {
-                            if (getConfig().options?.toggleNetherites == true && armor.material == ArmorMaterials.NETHERITE) {
-                                CustomArmors.armorList[itemStack.item] ?: continue
-                            } else {
-                                CustomArmorBar.DEFAULT
-                            }
+                            CustomArmorBar.DEFAULT
                         }
+                    }
+                    if (attributes.containsKey(EntityAttributes.GENERIC_ARMOR)) {
                         val b = attributes.get(EntityAttributes.GENERIC_ARMOR).map { it.value }.sum().toInt()
                         repeat(b) {
-                            armorItem[armorPoints + it] = Pair(itemStack, barData)
+                            armorItem[armorPoints++] = Pair(itemStack, barData)
                         }
-                        armorPoints += b
+                    } else {
+                        repeat(armor.protection) {
+                            armorItem[armorPoints++] = Pair(itemStack, barData)
+                        }
                     }
                 }
             }
@@ -212,6 +216,9 @@ class ArmorBarRenderer {
                         }
                     }
                 }
+            }
+            repeat(player.attributes.getBaseValue(EntityAttributes.GENERIC_ARMOR).toInt()) {
+                armorItem[armorPoints++] = Pair(ItemStack.EMPTY, CustomArmorBar.DEFAULT)
             }
             return armorItem
         }
@@ -230,11 +237,12 @@ class ArmorBarRenderer {
         val explosive = getProtectLevel(player.armorItems, ProtectionEnchantment.Type.EXPLOSION)
         val fire = getProtectLevel(player.armorItems, ProtectionEnchantment.Type.FIRE)
         val protectArr = intArrayOf(generic.total + generic.count, projectile.total, explosive.total, fire.total, 0)
-        val armorPoints = getArmorPoints(player.armorItems.reversed())
+        val armorPoints = getArmorPoints(player)
         val thorns = getThorns(player.armorItems)
 
         val playerHealth = MathHelper.ceil(player.health)
-        val playerArmor = min(armorPoints.size, 20)
+        val maxArmorPoints = armorPoints.size
+        val minArmorPoints = min(maxArmorPoints, 20)
         val totalEnchants = protectArr.sum()
         val maxHealth = player.getAttributeValue(EntityAttributes.GENERIC_MAX_HEALTH).toFloat().coerceAtLeast(playerHealth.toFloat())
         val absorptionHealth = MathHelper.ceil(player.absorptionAmount)
@@ -248,13 +256,15 @@ class ArmorBarRenderer {
         RenderSystem.setShader(GameRenderer::getPositionTexShader)
 
         //Default
-        for (count in 0..9) {
-            if (playerArmor > 0) {
+        if (maxArmorPoints > 0) {
+            val stackCount = maxArmorPoints / 20
+            val stackRow = stackCount * 20
+            for (count in 0..9) {
                 val xPos = screenWidth + count * 8
 
-                if (count * 2 + 1 < playerArmor) {
-                    val am1 = armorPoints.getOrDefault(count * 2, Pair(ItemStack.EMPTY, CustomArmorBar.DEFAULT))
-                    val am2 = armorPoints.getOrDefault(count * 2 + 1, Pair(ItemStack.EMPTY, CustomArmorBar.DEFAULT))
+                if (count * 2 + 1 + stackRow < maxArmorPoints) {
+                    val am1 = armorPoints.getOrDefault(count * 2 + stackRow, Pair(ItemStack.EMPTY, CustomArmorBar.DEFAULT))
+                    val am2 = armorPoints.getOrDefault(count * 2 + 1 + stackRow, Pair(ItemStack.EMPTY, CustomArmorBar.DEFAULT))
                     if (am1 == am2 || (am1.first.item is ArmorItem && (am1.first.item as? ArmorItem)?.material == (am2.first.item as? ArmorItem)?.material)) {
                         am1.second.draw(am1.first, matrices, xPos, yPos, false, isMirror = false)
                     } else {
@@ -262,13 +272,19 @@ class ArmorBarRenderer {
                         am1.second.draw(am1.first, matrices, xPos, yPos, true, isMirror = false)
                     }
                 }
-                if (count * 2 + 1 == playerArmor) {
+                if (count * 2 + 1 + stackRow == maxArmorPoints) {
                     CustomArmorBar.EMPTY.draw(ItemStack.EMPTY, matrices, xPos, yPos, false, isMirror = false)
-                    val am = armorPoints.getOrDefault(count * 2, Pair(ItemStack.EMPTY, CustomArmorBar.DEFAULT))
+                    val am = armorPoints.getOrDefault(count * 2 + stackRow, Pair(ItemStack.EMPTY, CustomArmorBar.DEFAULT))
                     am.second.draw(am.first, matrices, xPos, yPos, true, isMirror = false)
                 }
-                if (count * 2 + 1 > playerArmor) {
+                if (count * 2 + 1 + stackRow > maxArmorPoints) {
                     CustomArmorBar.EMPTY.draw(ItemStack.EMPTY, matrices, xPos, yPos, false, isMirror = false)
+                }
+            }
+
+            if (armorPoints.size > 20) {
+                repeat(stackCount) {
+                    CustomArmorBar.DEFAULT.draw(ItemStack.EMPTY, matrices, screenWidth - 7 - ((stackCount-it)*3), yPos, false, isMirror = false)
                 }
             }
         }
@@ -277,14 +293,14 @@ class ArmorBarRenderer {
         if (getConfig().options?.toggleDurability == true) {
             var lowDur = getLowDurabilityItem(player.armorItems)
             val lowDurColor = getLowDurabilityColor()
-            val halfArmors = ceil(playerArmor / 2.0).toInt() - 1
-            if (playerArmor != 0 && lowDur != 0) {
+            val halfArmors = ceil(minArmorPoints / 2.0).toInt() - 1
+            if (minArmorPoints != 0 && lowDur != 0) {
                 for (count in 0..halfArmors) {
                     if (lowDur == 0) break
 
                     val xPos = screenWidth + (halfArmors - count) * 8
                     val am = armorPoints.getOrDefault((halfArmors - count) * 2, Pair(ItemStack.EMPTY, CustomArmorBar.DEFAULT))
-                    if (playerArmor == (halfArmors - count) * 2 + 1) {
+                    if (minArmorPoints == (halfArmors - count) * 2 + 1) {
                         if (count == 0) {
                             am.second.drawOutLine(am.first, matrices, xPos, yPos, true, isMirror = false, lowDurColor)
                             lowDur--
@@ -303,17 +319,19 @@ class ArmorBarRenderer {
         }
 
         //Mending Color
-        if (getConfig().options?.toggleMending == true) {
+        if (getConfig().options?.toggleMending == true && minArmorPoints != 0 && maxArmorPoints > 0) {
             val mendingTime = DetailArmorBar.getTicks() - LAST_MENDING
             val mendingSpeed = 3
-            for (count in 0..9) {
-                if (playerArmor == 0 || mendingTime >= (mendingSpeed * 4)) break
+            if (mendingTime < (mendingSpeed * 4)) {
+                for (count in 0..9) {
+                    if (minArmorPoints == 0 || mendingTime >= (mendingSpeed * 4)) break
 
-                if (mendingTime % (mendingSpeed * 2) < mendingSpeed) {
-                    val xPos = screenWidth + count * 8
+                    if (mendingTime % (mendingSpeed * 2) < mendingSpeed) {
+                        val xPos = screenWidth + count * 8
 
-                    val am = armorPoints.getOrDefault(count * 2, Pair(ItemStack.EMPTY, CustomArmorBar.EMPTY))
-                    am.second.drawOutLine(am.first, matrices, xPos, yPos, false, isMirror = false, Color.WHITE)
+                        val am = armorPoints.getOrDefault(count * 2, Pair(ItemStack.EMPTY, CustomArmorBar.EMPTY))
+                        am.second.drawOutLine(am.first, matrices, xPos, yPos, false, isMirror = false, Color.WHITE)
+                    }
                 }
             }
         }
@@ -321,9 +339,9 @@ class ArmorBarRenderer {
         RenderSystem.setShaderTexture(0, GUI_ARMOR_BAR)
 
         //Armor Enchantments
-        if (getConfig().options?.toggleEnchants == true) {
+        if (getConfig().options?.toggleEnchants == true && totalEnchants != 0 && maxArmorPoints > 0) {
             for (count in 0..9) {
-                if (totalEnchants == 0 || count * 2 + 1 > totalEnchants) break
+                if (count * 2 + 1 > totalEnchants) break
 
                 val xPos = screenWidth + count * 8
                 if (count * 2 + 1 < totalEnchants) {
@@ -354,10 +372,10 @@ class ArmorBarRenderer {
         }
 
         //Thorns Check
-        if (getConfig().options?.toggleThorns == true) {
+        if (getConfig().options?.toggleThorns == true && thorns.total != 0 && maxArmorPoints > 0) {
             val thornsColor = getThornColor()
             for (count in 0..9) {
-                if (thorns.total == 0 || count * 2 + 1 > thorns.total) break
+                if (count * 2 + 1 > thorns.total) break
 
                 val xPos = screenWidth + count * 8
                 if (count * 2 + 1 < thorns.total) {
