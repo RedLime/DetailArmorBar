@@ -205,7 +205,7 @@ class ArmorBarRenderer {
                 }
             }
             if (getConfig().options?.toggleItemBar == true) {
-                for (itemStack in equipment.filter { !it.isEmpty && !(it.item is ArmorItem) }) {
+                for (itemStack in equipment.filter { !it.isEmpty && it.item !is ArmorItem }) {
                     if (!itemStack.isEmpty) {
                         if (CustomArmors.itemList.containsKey(itemStack.item)) {
                             if (armorPoints % 2 == 1)
@@ -255,7 +255,7 @@ class ArmorBarRenderer {
 
         //Default
         if (maxArmorPoints > 0) {
-            val stackCount = maxArmorPoints / 20
+            val stackCount = (maxArmorPoints - 1) / 20
             val stackRow = stackCount * 20
             for (count in 0..9) {
                 val xPos = screenWidth + count * 8
