@@ -15,7 +15,7 @@ public class ThornsEnchantmentMixin {
     @Redirect(method = "onUserDamaged(Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/entity/Entity;I)V",
             at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;damage(Lnet/minecraft/entity/damage/DamageSource;F)Z"))
     private boolean attackerDamage(Entity attacker, DamageSource source, float damage) {
-        if (damage > 0.2f) ArmorBarRenderer.Companion.setLAST_THORNS(DetailArmorBar.INSTANCE.getTicks());
+        if (damage > 0.2f) ArmorBarRenderer.LAST_THORNS = DetailArmorBar.getTicks();
         return attacker.damage(source, damage);
     }
 }

@@ -20,7 +20,7 @@ public class ExperienceOrbEntityMixin {
         ItemStack itemStack = entry.getValue();
         EquipmentSlot key = entry.getKey();
         if (key.getType() == EquipmentSlot.Type.ARMOR)
-            ArmorBarRenderer.Companion.setLAST_MENDING(DetailArmorBar.INSTANCE.getTicks());
+            ArmorBarRenderer.LAST_MENDING = DetailArmorBar.getTicks();
         return itemStack;
     }
 }

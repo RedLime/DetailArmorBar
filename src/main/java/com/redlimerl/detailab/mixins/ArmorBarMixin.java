@@ -21,7 +21,7 @@ public class ArmorBarMixin extends DrawableHelper {
     @Inject(method = "renderStatusBars(Lnet/minecraft/client/util/math/MatrixStack;)V",
             at = @At(value = "INVOKE", target = "Lnet/minecraft/util/profiler/Profiler;pop()V"))
     private void renderArmorOverlay(MatrixStack matrices, CallbackInfo info) {
-        ArmorBarRenderer.Companion.getINSTANCE().render(matrices, getCameraPlayer());
+        ArmorBarRenderer.INSTANCE.render(matrices, getCameraPlayer());
     }
 
     @Redirect(method = "renderStatusBars", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/PlayerEntity;getArmor()I"))
