@@ -15,8 +15,8 @@ public class ArmorBarBuilder {
     private Function<ItemStack, ArmorBarRenderManager> predicate;
 
     /**
-     * Specifies the [ArmorItem] on which the armor bar will appear when equipped.
-     * @throws IllegalStateException [armorItem] aren't [ArmorItem].
+     * Specifies the {@link ArmorItem} on which the armor bar will appear when equipped.
+     * @throws IllegalStateException [armorItem] aren't {@link ArmorItem}.
      */
     public ArmorBarBuilder armor(ArmorItem... armorItem) {
         try {
@@ -29,7 +29,7 @@ public class ArmorBarBuilder {
 
     /**
      * Specifies the render options for the Armor Bar.
-     * @See ArmorBarRenderManager
+     * @see ArmorBarRenderManager
      */
     public ArmorBarBuilder render(Function<ItemStack, ArmorBarRenderManager> renderManager) {
         predicate = renderManager;
@@ -38,7 +38,7 @@ public class ArmorBarBuilder {
 
     /**
      * Registers the Custom Armor Bar so that it can be displayed.
-     * @throws IllegalStateException Not all items have been initialized. check out [armor], [render].
+     * @throws IllegalStateException Not all items have been initialized. check out {@link #armor(ArmorItem...)}, {@link #render(Function)}
      */
     public void register() {
         try {

@@ -16,7 +16,7 @@ public class ItemBarBuilder {
 
 
     /**
-     * Specifies the [Item] on which the armor bar will appear when equipped.
+     * Specifies the {@link Item} on which the armor bar will appear when equipped.
      * @throws IllegalStateException If [item] is not Wearable, an error occurs.
      */
     public ItemBarBuilder item(Item item) {
@@ -27,7 +27,7 @@ public class ItemBarBuilder {
 
     /**
      * Specifies the render options for the Armor Bar.
-     * @See ItemBarRenderManager
+     * @see ItemBarRenderManager
      */
     public ItemBarBuilder render(Function<ItemStack, ItemBarRenderManager> renderManager) {
         predicate = renderManager;
@@ -36,8 +36,8 @@ public class ItemBarBuilder {
 
     /**
      * Registers the Custom Armor Bar so that it can be displayed.
-     * @throws IllegalStateException Not all items have been initialized. check out [item], [render].
-     * @throws IllegalStateException If [item] is not Wearable, an error occurs.
+     * @throws IllegalStateException Not all items have been initialized. check out item, render.
+     * @throws IllegalStateException If {@link #item} is not Wearable, an error occurs.
      */
     public void register() {
         try {
