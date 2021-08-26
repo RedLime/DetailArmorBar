@@ -141,7 +141,7 @@ public class ArmorBarRenderer {
         HashMap<Integer, Pair<ItemStack, CustomArmorBar>> armorItem = new HashMap<>();
         Stack<ItemStack> equipment = new Stack<>();
         for (ItemStack item : player.getArmorItems()) {
-            equipment.add(item);
+            equipment.add(0, item);
         }
 
         for (int i = 0; i < player.getAttributes().getBaseValue(EntityAttributes.GENERIC_ARMOR); i++)
