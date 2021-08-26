@@ -1,13 +1,14 @@
 package com.redlimerl.detailab.api.render;
 
-import net.minecraft.util.Identifier;
-import org.jetbrains.annotations.NotNull;
 
+import net.minecraft.resources.ResourceLocation;
+
+import javax.annotation.Nonnull;
 import java.awt.*;
 
 public class ArmorBarRenderManager extends BarRenderManager {
 
-    private final Identifier texture;
+    private final ResourceLocation texture;
     private final int textureWidth;
     private final int textureHeight;
     private final TextureOffset textureOffsetFull;
@@ -16,12 +17,12 @@ public class ArmorBarRenderManager extends BarRenderManager {
     private final TextureOffset textureOffsetOutlineHalf;
     private final Color color;
 
-    public ArmorBarRenderManager(Identifier texture, int textureWidth, int textureHeight, TextureOffset textureOffsetFull, TextureOffset textureOffsetHalf,
+    public ArmorBarRenderManager(ResourceLocation texture, int textureWidth, int textureHeight, TextureOffset textureOffsetFull, TextureOffset textureOffsetHalf,
                                  TextureOffset textureOffsetOutline, TextureOffset textureOffsetOutlineHalf) {
         this(texture, textureWidth, textureHeight, textureOffsetFull, textureOffsetHalf, textureOffsetOutline, textureOffsetOutlineHalf, Color.WHITE);
     }
 
-    public ArmorBarRenderManager(Identifier texture, int textureWidth, int textureHeight, TextureOffset textureOffsetFull, TextureOffset textureOffsetHalf,
+    public ArmorBarRenderManager(ResourceLocation texture, int textureWidth, int textureHeight, TextureOffset textureOffsetFull, TextureOffset textureOffsetHalf,
                                  TextureOffset textureOffsetOutline, TextureOffset textureOffsetOutlineHalf, Color color) {
         this.texture = texture;
         this.textureWidth = textureWidth;
@@ -34,8 +35,8 @@ public class ArmorBarRenderManager extends BarRenderManager {
     }
 
 
-    @Override
-    public @NotNull Identifier getTexture() {
+    @Override @Nonnull
+    public ResourceLocation getTexture() {
         return this.texture;
     }
 
@@ -49,23 +50,23 @@ public class ArmorBarRenderManager extends BarRenderManager {
         return this.textureHeight;
     }
 
-    @Override
-    public @NotNull TextureOffset getTextureOffsetFull() {
+    @Override @Nonnull
+    public TextureOffset getTextureOffsetFull() {
         return this.textureOffsetFull;
     }
 
-    @Override
-    public @NotNull TextureOffset getTextureOffsetHalf() {
+    @Override @Nonnull
+    public TextureOffset getTextureOffsetHalf() {
         return this.textureOffsetHalf;
     }
 
-    @Override
-    public @NotNull TextureOffset getTextureOffsetOutline() {
+    @Override @Nonnull
+    public TextureOffset getTextureOffsetOutline() {
         return this.textureOffsetOutline;
     }
 
-    @Override
-    public @NotNull TextureOffset getTextureOffsetOutlineHalf() {
+    @Override @Nonnull
+    public TextureOffset getTextureOffsetOutlineHalf() {
         return this.textureOffsetOutlineHalf;
     }
 
@@ -74,8 +75,8 @@ public class ArmorBarRenderManager extends BarRenderManager {
         return false;
     }
 
-    @Override
-    public @NotNull Color getColor() {
+    @Override @Nonnull
+    public Color getColor() {
         return this.color;
     }
 }

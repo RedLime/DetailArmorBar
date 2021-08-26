@@ -2,26 +2,26 @@ package com.redlimerl.detailab.render;
 
 import com.google.common.collect.Multimap;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.datafixers.util.Pair;
 import com.redlimerl.detailab.DetailArmorBar;
 import com.redlimerl.detailab.api.DetailArmorBarAPI;
 import com.redlimerl.detailab.api.render.CustomArmorBar;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawableHelper;
-import net.minecraft.client.gui.hud.InGameHud;
-import net.minecraft.client.render.GameRenderer;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.enchantment.Enchantment;
-import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.enchantment.Enchantments;
-import net.minecraft.entity.attribute.EntityAttribute;
-import net.minecraft.entity.attribute.EntityAttributeModifier;
-import net.minecraft.entity.attribute.EntityAttributes;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ArmorItem;
-import net.minecraft.item.ArmorMaterials;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.Pair;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Gui;
+import net.minecraft.client.gui.GuiComponent;
+import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ArmorItem;
+import net.minecraft.world.item.ArmorMaterials;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.item.enchantment.Enchantments;
+import org.apache.logging.log4j.Level;
 
 import java.awt.*;
 import java.util.Arrays;
@@ -58,6 +58,10 @@ public class ArmorBarRenderer {
         };
     }
 
+    private static float lerp(float delta, float start, float end) {
+        return start + delta * (end - start);
+    }
+
     private static Color getProtectColor(int g, int p, int e, int f, int a) {
         int speed = getAnimationSpeed();
         int alpha;
@@ -66,8 +70,8 @@ public class ArmorBarRenderer {
             long time = DetailArmorBar.getTicks();
             if (time % (speed*4L) < (speed*2L)) alpha = 0;
             else if (time % (speed*2L) < speed)
-                alpha = Math.round(MathHelper.lerp((time % speed) / (speed - 1f), 0f, 0.65f) * 255);
-            else alpha = Math.round(MathHelper.lerp((time % speed) / (speed - 1f), 0.65f, 0f) * 255);
+                alpha = Math.round(lerp((time % speed) / (speed - 1f), 0f, 0.65f) * 255);
+            else alpha = Math.round(lerp((time % speed) / (speed - 1f), 0.65f, 0f) * 255);
         } else alpha = 0;
 
         if (g > 0) return new Color(153, 255, 255, alpha);
@@ -88,8 +92,8 @@ public class ArmorBarRenderer {
         int alpha;
         if (time % (speed*4L) >= (speed*2L)) alpha = 0;
         else if (time % (speed*2L) < speed)
-            alpha = Math.round(MathHelper.lerp((time % speed) / (speed - 1f), 0f, 0.65f) * 255);
-        else alpha = Math.round(MathHelper.lerp((time % speed) / (speed - 1f), 0.65f, 0f) * 255);
+            alpha = Math.round(lerp((time % speed) / (speed - 1f), 0f, 0.65f) * 255);
+        else alpha = Math.round(lerp((time % speed) / (speed - 1f), 0.65f, 0f) * 255);
 
         return new Color(255, 25, 25, alpha);
     }
@@ -99,7 +103,7 @@ public class ArmorBarRenderer {
         if (getConfig().getOptions().effectThorn == Animation.STATIC) return Color.WHITE;
         if (time > 19) return Color.WHITE;
 
-        int cc = Math.round(MathHelper.lerp((time % 20) / 19f, 0f, 1f)*255);
+        int cc = Math.round(lerp((time % 20) / 19f, 0f, 1f)*255);
         return new Color(255, cc, cc);
     }
 
@@ -108,7 +112,7 @@ public class ArmorBarRenderer {
 
         for (ItemStack itemStack : equipment) {
             if (!itemStack.isEmpty()) {
-                EnchantmentHelper.get(itemStack).forEach((enchantment, integer) -> {
+                EnchantmentHelper.getEnchantments(itemStack).forEach((enchantment, integer) -> {
                     LevelData enchantData = result.getOrDefault(enchantment, new LevelData(0, 0));
                     enchantData.count++;
                     enchantData.level += integer;
@@ -128,29 +132,29 @@ public class ArmorBarRenderer {
         var count = 0;
         for (ItemStack itemStack : equipment) {
             if (!itemStack.isEmpty()) {
-                if (itemStack.getMaxDamage() != 0 && ((itemStack.getDamage() * 100f) / (itemStack.getMaxDamage() * 100f)) >= 0.92f) {
-                    count += itemStack.getItem() instanceof ArmorItem ? ((ArmorItem) itemStack.getItem()).getProtection() : 2;
+                if (itemStack.getMaxDamage() != 0 && ((itemStack.getDamageValue() * 100f) / (itemStack.getMaxDamage() * 100f)) >= 0.92f) {
+                    count += itemStack.getItem() instanceof ArmorItem ? ((ArmorItem) itemStack.getItem()).getDefense() : 2;
                 }
             }
         }
+
         return count;
     }
 
-    private static Map<Integer, Pair<ItemStack, CustomArmorBar>> getArmorPoints(PlayerEntity player) {
+    private static Map<Integer, Pair<ItemStack, CustomArmorBar>> getArmorPoints(Player player) {
         int armorPoints = 0;
         HashMap<Integer, Pair<ItemStack, CustomArmorBar>> armorItem = new HashMap<>();
         Stack<ItemStack> equipment = new Stack<>();
-        for (ItemStack item : player.getArmorItems()) {
-            equipment.add(item);
+        for (ItemStack item : player.getArmorSlots()) {
+            equipment.add(0, item);
         }
 
-        for (int i = 0; i < player.getAttributes().getBaseValue(EntityAttributes.GENERIC_ARMOR); i++)
+        for (int i = 0; i < player.getAttributes().getBaseValue(Attributes.ARMOR); i++)
             armorItem.put(armorPoints++, new Pair<>(ItemStack.EMPTY, CustomArmorBar.DEFAULT));
 
         for (ItemStack itemStack : equipment) {
-            if (!itemStack.isEmpty() && itemStack.getItem() instanceof ArmorItem) {
-                ArmorItem armor = (ArmorItem) itemStack.getItem();
-                Multimap<EntityAttribute, EntityAttributeModifier> attributes = itemStack.getAttributeModifiers(armor.getSlotType());
+            if (!itemStack.isEmpty() && itemStack.getItem() instanceof ArmorItem armor) {
+                Multimap<Attribute, AttributeModifier> attributes = itemStack.getAttributeModifiers(armor.getSlot());
 
                 CustomArmorBar barData;
                 if (getConfig().getOptions().toggleArmorTypes) {
@@ -161,13 +165,13 @@ public class ArmorBarRenderer {
                     barData = CustomArmorBar.DEFAULT;
                 }
 
-                if (attributes.containsKey(EntityAttributes.GENERIC_ARMOR)) {
-                    int b = attributes.get(EntityAttributes.GENERIC_ARMOR).stream().mapToInt(att -> (int) att.getValue()).sum();
+                if (attributes.containsKey(Attributes.ARMOR)) {
+                    int b = attributes.get(Attributes.ARMOR).stream().mapToInt(att -> (int) att.getAmount()).sum();
                     for (int i = 0; i < b; i++) {
                         armorItem.put(armorPoints++, new Pair<>(itemStack, barData));
                     }
                 } else {
-                    for (int i = 0; i < armor.getProtection(); i++) {
+                    for (int i = 0; i < armor.getDefense(); i++) {
                         armorItem.put(armorPoints++, new Pair<>(itemStack, barData));
                     }
                 }
@@ -191,29 +195,29 @@ public class ArmorBarRenderer {
 
 
 
-    private final MinecraftClient client = MinecraftClient.getInstance();
-    private final InGameHud hud = client.inGameHud;
+    private final Minecraft client = Minecraft.getInstance();
+    private final Gui hud = client.gui;
 
-    public void render(MatrixStack matrices, PlayerEntity player) {
-        client.getProfiler().swap("armor");
+    public void render(PoseStack matrices, Player player) {
+        client.getProfiler().popPush("armor");
 
-        var generic = getEnchantLevel(player.getArmorItems(), Enchantments.PROTECTION);
-        var projectile = getEnchantLevel(player.getArmorItems(), Enchantments.PROJECTILE_PROTECTION);
-        var explosive = getEnchantLevel(player.getArmorItems(), Enchantments.BLAST_PROTECTION);
-        var fire = getEnchantLevel(player.getArmorItems(), Enchantments.FIRE_PROTECTION);
+        var generic = getEnchantLevel(player.getArmorSlots(), Enchantments.ALL_DAMAGE_PROTECTION);
+        var projectile = getEnchantLevel(player.getArmorSlots(), Enchantments.PROJECTILE_PROTECTION);
+        var explosive = getEnchantLevel(player.getArmorSlots(), Enchantments.BLAST_PROTECTION);
+        var fire = getEnchantLevel(player.getArmorSlots(), Enchantments.FIRE_PROTECTION);
         var protectArr = new int[] { generic.level + generic.count, projectile.level, explosive.level, fire.level, 0 };
         var armorPoints = getArmorPoints(player);
-        var thorns = getEnchantLevel(player.getArmorItems(), Enchantments.THORNS);
+        var thorns = getEnchantLevel(player.getArmorSlots(), Enchantments.THORNS);
 
-        var playerHealth = MathHelper.ceil(player.getHealth());
+        var playerHealth = Math.ceil(player.getHealth());
         var maxArmorPoints = armorPoints.size();
         var minArmorPoints = Math.min(maxArmorPoints, 20);
         var totalEnchants = Arrays.stream(protectArr).sum();
-        var maxHealth = Math.max(player.getAttributeValue(EntityAttributes.GENERIC_MAX_HEALTH), playerHealth);
-        var absorptionHealth = MathHelper.ceil(player.getAbsorptionAmount());
-        var resultHealth = MathHelper.ceil((maxHealth + absorptionHealth) / 20.0f);
-        var screenWidth = client.getWindow().getScaledWidth() / 2 - 91;
-        var screenHeight = client.getWindow().getScaledHeight() - 39;
+        var maxHealth = Math.max(player.getAttributeValue(Attributes.MAX_HEALTH), playerHealth);
+        var absorptionHealth = Math.ceil(player.getAbsorptionAmount());
+        var resultHealth = (int) Math.ceil((maxHealth + absorptionHealth) / 20.0f);
+        var screenWidth = client.getWindow().getGuiScaledWidth() / 2 - 91;
+        var screenHeight = client.getWindow().getGuiScaledHeight() - 39;
         var yPos = screenHeight - (resultHealth - 1) * Math.max(8 - resultHealth, 3) - 10;
 
         RenderSystem.enableBlend();
@@ -230,19 +234,19 @@ public class ArmorBarRenderer {
                 if (count * 2 + 1 + stackRow < maxArmorPoints) {
                     Pair<ItemStack, CustomArmorBar> am1 = armorPoints.getOrDefault(count * 2 + stackRow, new Pair<>(ItemStack.EMPTY, CustomArmorBar.DEFAULT));
                     Pair<ItemStack, CustomArmorBar> am2 = armorPoints.getOrDefault(count * 2 + 1 + stackRow, new Pair<>(ItemStack.EMPTY, CustomArmorBar.DEFAULT));
-                    if (am1 == am2 || (am1.getLeft().getItem() instanceof ArmorItem && ((ArmorItem) am1.getLeft().getItem()).getMaterial() ==
-                            (am2.getLeft().getItem() instanceof ArmorItem ? ((ArmorItem) am2.getLeft().getItem()).getMaterial() : null)
+                    if (am1 == am2 || (am1.getFirst().getItem() instanceof ArmorItem && ((ArmorItem) am1.getFirst().getItem()).getMaterial() ==
+                            (am2.getFirst().getItem() instanceof ArmorItem ? ((ArmorItem) am2.getFirst().getItem()).getMaterial() : null)
                     )) {
-                        am1.getRight().draw(am1.getLeft(), matrices, xPos, yPos, false, false);
+                        am1.getSecond().draw(am1.getFirst(), matrices, xPos, yPos, false, false);
                     } else {
-                        am2.getRight().draw(am2.getLeft(), matrices, xPos, yPos, true, true);
-                        am1.getRight().draw(am1.getLeft(), matrices, xPos, yPos, true, false);
+                        am2.getSecond().draw(am2.getFirst(), matrices, xPos, yPos, true, true);
+                        am1.getSecond().draw(am1.getFirst(), matrices, xPos, yPos, true, false);
                     }
                 }
                 if (count * 2 + 1 + stackRow == maxArmorPoints) {
                     CustomArmorBar.EMPTY.draw(ItemStack.EMPTY, matrices, xPos, yPos, false, false);
                     Pair<ItemStack, CustomArmorBar> am = armorPoints.getOrDefault(count * 2 + stackRow, new Pair<>(ItemStack.EMPTY, CustomArmorBar.DEFAULT));
-                    am.getRight().draw(am.getLeft(), matrices, xPos, yPos, true, false);
+                    am.getSecond().draw(am.getFirst(), matrices, xPos, yPos, true, false);
                 }
                 if (count * 2 + 1 + stackRow > maxArmorPoints) {
                     CustomArmorBar.EMPTY.draw(ItemStack.EMPTY, matrices, xPos, yPos, false, false);
@@ -258,25 +262,28 @@ public class ArmorBarRenderer {
 
         //Durability Color
         if (getConfig().getOptions().toggleDurability) {
-            int lowDur = getLowDurabilityItem(player.getArmorItems());
+            int lowDur = getLowDurabilityItem(player.getArmorSlots());
 
             if (minArmorPoints != 0 && lowDur != 0) {
                 Color lowDurColor = getLowDurabilityColor();
                 var halfArmors = (int) Math.ceil(minArmorPoints / 2.0) - 1;
                 for (int count = 0; count < halfArmors; count++) {
+                    if (lowDur == 0) break;
+
                     int xPos = screenWidth + (halfArmors - count) * 8;
                     Pair<ItemStack, CustomArmorBar> am = armorPoints.getOrDefault((halfArmors - count) * 2, new Pair<>(ItemStack.EMPTY, CustomArmorBar.DEFAULT));
+
                     if (minArmorPoints == (halfArmors - count) * 2 + 1) {
                         if (count == 0) {
-                            am.getRight().drawOutLine(am.getLeft(), matrices, xPos, yPos, true, false, lowDurColor);
+                            am.getSecond().drawOutLine(am.getFirst(), matrices, xPos, yPos, true, false, lowDurColor);
                             lowDur--;
                         }
                     } else {
                         if (lowDur == 1) {
-                            am.getRight().drawOutLine(am.getLeft(), matrices, xPos, yPos, true, true, lowDurColor);
+                            am.getSecond().drawOutLine(am.getFirst(), matrices, xPos, yPos, true, true, lowDurColor);
                             lowDur = 0;
                         } else {
-                            am.getRight().drawOutLine(am.getLeft(), matrices, xPos, yPos, false, false, lowDurColor);
+                            am.getSecond().drawOutLine(am.getFirst(), matrices, xPos, yPos, false, false, lowDurColor);
                             lowDur -= 2;
                         }
                     }
@@ -295,7 +302,7 @@ public class ArmorBarRenderer {
                         int xPos = screenWidth + count * 8;
 
                         Pair<ItemStack, CustomArmorBar> am = armorPoints.getOrDefault(count * 2, new Pair<>(ItemStack.EMPTY, CustomArmorBar.EMPTY));
-                        am.getRight().drawOutLine(am.getLeft(), matrices, xPos, yPos, false, false, Color.WHITE);
+                        am.getSecond().drawOutLine(am.getFirst(), matrices, xPos, yPos, false, false, Color.WHITE);
                     }
                 }
             }
@@ -353,13 +360,13 @@ public class ArmorBarRenderer {
 
         RenderSystem.disableBlend();
         RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
-        RenderSystem.setShaderTexture(0, DrawableHelper.GUI_ICONS_TEXTURE);
+        RenderSystem.setShaderTexture(0, GuiComponent.GUI_ICONS_LOCATION);
     }
 
-    private void drawEnchantTexture(MatrixStack matrices, int x, int y, Color color, int half) {
+    private void drawEnchantTexture(PoseStack matrices, int x, int y, Color color, int half) {
         int u = 0;
         int v = 0;
-        var t = (hud.getTicks()/3) % 36;
+        var t = (hud.getGuiTicks()/3) % 36;
 
         if (getConfig().getOptions().effectType == ProtectionEffect.AURA) {
             if (t < 12) {

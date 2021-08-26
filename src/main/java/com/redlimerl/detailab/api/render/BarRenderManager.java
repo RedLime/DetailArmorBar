@@ -1,33 +1,34 @@
 package com.redlimerl.detailab.api.render;
 
-import net.minecraft.util.Identifier;
-import org.jetbrains.annotations.NotNull;
 
+import net.minecraft.resources.ResourceLocation;
+
+import javax.annotation.Nonnull;
 import java.awt.*;
 
 public abstract class BarRenderManager {
 
-    @NotNull
-    public abstract Identifier getTexture();
+    @Nonnull
+    public abstract ResourceLocation getTexture();
 
     public abstract int getTextureWidth();
 
     public abstract int getTextureHeight();
 
-    @NotNull
+    @Nonnull
     public abstract TextureOffset getTextureOffsetFull();
 
-    @NotNull
+    @Nonnull
     public abstract TextureOffset getTextureOffsetHalf();
 
-    @NotNull
+    @Nonnull
     public abstract TextureOffset getTextureOffsetOutline();
 
-    @NotNull
+    @Nonnull
     public abstract TextureOffset getTextureOffsetOutlineHalf();
 
     public abstract boolean isShown();
 
-    @NotNull
+    @Nonnull
     public abstract Color getColor();
 }

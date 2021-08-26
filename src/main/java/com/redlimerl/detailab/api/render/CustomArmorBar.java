@@ -1,10 +1,10 @@
 package com.redlimerl.detailab.api.render;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.redlimerl.detailab.DetailArmorBar;
 import com.redlimerl.detailab.render.InGameDrawer;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
 
 import java.awt.*;
 import java.util.function.Function;
@@ -30,7 +30,7 @@ public class CustomArmorBar {
         this.predicate = predicate;
     }
 
-    public void draw(ItemStack itemStack, MatrixStack matrices, int xPos, int yPos, boolean isHalf, boolean isMirror) {
+    public void draw(ItemStack itemStack, PoseStack matrices, int xPos, int yPos, boolean isHalf, boolean isMirror) {
         BarRenderManager renderInfo = predicate.apply(itemStack);
         if (renderInfo.isShown()) return;
 
@@ -45,15 +45,20 @@ public class CustomArmorBar {
         }
     }
 
-    public void drawOutLine(ItemStack itemStack, MatrixStack matrices, int xPos, int yPos, boolean isHalf, boolean isMirror, Color color) {
+    public void drawOutLine(ItemStack itemStack, PoseStack matrices, int xPos, int yPos, boolean isHalf, boolean isMirror, Color color) {
         BarRenderManager renderInfo = predicate.apply(itemStack);
         if (renderInfo.isShown()) return;
 
         RenderSystem.setShaderTexture(0, renderInfo.getTexture());
 
         if (isHalf) {
-            InGameDrawer.drawTexture(matrices, xPos, yPos, renderInfo.getTextureOffsetOutlineHalf().x, renderInfo.getTextureOffsetOutlineHalf().y,
-                    renderInfo.getTextureWidth(), renderInfo.getTextureHeight(), color, isMirror);
+            if (renderInfo instanceof ItemBarRenderManager) {
+                InGameDrawer.drawTexture(matrices, xPos + 4, yPos, renderInfo.getTextureOffsetOutlineHalf().x + 4, renderInfo.getTextureOffsetOutlineHalf().y, 5, 9,
+                        renderInfo.getTextureWidth(), renderInfo.getTextureHeight(), color, false);
+            } else {
+                InGameDrawer.drawTexture(matrices, xPos, yPos, renderInfo.getTextureOffsetOutlineHalf().x, renderInfo.getTextureOffsetOutlineHalf().y,
+                        renderInfo.getTextureWidth(), renderInfo.getTextureHeight(), color, isMirror);
+            }
         } else {
             InGameDrawer.drawTexture(matrices, xPos, yPos, renderInfo.getTextureOffsetOutline().x, renderInfo.getTextureOffsetOutline().y,
                     renderInfo.getTextureWidth(), renderInfo.getTextureHeight(), color, false);

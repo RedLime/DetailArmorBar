@@ -3,11 +3,11 @@ package com.redlimerl.detailab.api;
 import com.redlimerl.detailab.DetailArmorBar;
 import com.redlimerl.detailab.api.render.CustomArmorBar;
 import com.redlimerl.detailab.api.render.ItemBarRenderManager;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.registry.Registry;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import org.apache.logging.log4j.Level;
 
+import java.util.Objects;
 import java.util.function.Function;
 
 public class ItemBarBuilder {
@@ -42,7 +42,7 @@ public class ItemBarBuilder {
     public void register() {
         try {
             DetailArmorBarAPI.itemList.put(item, new CustomArmorBar(predicate));
-            DetailArmorBar.LOGGER.log(Level.INFO, "Successfully registered '"+ Registry.ITEM.getId(item) + "'!");
+            DetailArmorBar.LOGGER.log(Level.INFO, "Successfully registered '"+ Objects.requireNonNull(item.getRegistryName()) + "'!");
         } catch (Exception e) {
             throw new IllegalStateException("Not all items have been initialized");
         }

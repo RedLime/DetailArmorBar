@@ -4,27 +4,43 @@ import com.redlimerl.detailab.api.DetailArmorBarAPI;
 import com.redlimerl.detailab.api.render.ArmorBarRenderManager;
 import com.redlimerl.detailab.api.render.ItemBarRenderManager;
 import com.redlimerl.detailab.api.render.TextureOffset;
+import com.redlimerl.detailab.config.DABForgeConfig;
 import com.redlimerl.detailab.config.DetailArmorBarConfig;
-import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.item.ArmorItem;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.util.Identifier;
+import com.redlimerl.detailab.screen.OptionsScreen;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ArmorItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.fml.ModLoadingContext;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.config.ModConfig;
+import net.minecraftforge.fml.loading.FMLEnvironment;
+import net.minecraftforge.fmlclient.ConfigGuiHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.awt.*;
 import java.io.File;
-import java.nio.file.Path;
 
-public class DetailArmorBar implements ClientModInitializer {
 
-    public static Logger LOGGER = LogManager.getLogger("DetailArmorBar");
-    public static String MOD_ID = "detailab";
-    public static Identifier GUI_ARMOR_BAR = new Identifier(MOD_ID, "textures/armor_bar.png");
+@Mod(DetailArmorBar.MOD_ID)
+public class DetailArmorBar {
+
+    public final static Logger LOGGER = LogManager.getLogger("DetailArmorBar");
+    public final static String MOD_ID = "detailab";
+    public final static ResourceLocation GUI_ARMOR_BAR = new ResourceLocation(MOD_ID, "textures/armor_bar.png");
 
     private static DetailArmorBarConfig config = null;
+
+    public DetailArmorBar() {
+        if (FMLEnvironment.dist == Dist.CLIENT) {
+            onInitializeClient();
+            ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, DABForgeConfig.SPEC);
+            ModLoadingContext.get().registerExtensionPoint(ConfigGuiHandler.ConfigGuiFactory.class,
+                    () -> new ConfigGuiHandler.ConfigGuiFactory((mc, screen) -> new OptionsScreen(screen)));
+        }
+    }
 
     public static DetailArmorBarConfig getConfig() {
         if (config == null) loadConfig();
@@ -36,8 +52,7 @@ public class DetailArmorBar implements ClientModInitializer {
     }
 
     private static void loadConfig() {
-        Path configPath = FabricLoader.getInstance().getConfigDir();
-        File configFile = new File(configPath.toFile(), "detailarmorbar.json");
+        File configFile = new File("config/", "detailarmorbar.json");
         config = new DetailArmorBarConfig(configFile);
         config.load();
     }
