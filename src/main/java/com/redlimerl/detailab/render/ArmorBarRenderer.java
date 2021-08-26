@@ -148,8 +148,7 @@ public class ArmorBarRenderer {
             armorItem.put(armorPoints++, new Pair<>(ItemStack.EMPTY, CustomArmorBar.DEFAULT));
 
         for (ItemStack itemStack : equipment) {
-            if (!itemStack.isEmpty() && itemStack.getItem() instanceof ArmorItem) {
-                ArmorItem armor = (ArmorItem) itemStack.getItem();
+            if (!itemStack.isEmpty() && itemStack.getItem() instanceof ArmorItem armor) {
                 Multimap<EntityAttribute, EntityAttributeModifier> attributes = itemStack.getAttributeModifiers(armor.getSlotType());
 
                 CustomArmorBar barData;
@@ -264,6 +263,8 @@ public class ArmorBarRenderer {
                 Color lowDurColor = getLowDurabilityColor();
                 var halfArmors = (int) Math.ceil(minArmorPoints / 2.0) - 1;
                 for (int count = 0; count < halfArmors; count++) {
+                    if (lowDur <= 0) break;
+
                     int xPos = screenWidth + (halfArmors - count) * 8;
                     Pair<ItemStack, CustomArmorBar> am = armorPoints.getOrDefault((halfArmors - count) * 2, new Pair<>(ItemStack.EMPTY, CustomArmorBar.DEFAULT));
                     if (minArmorPoints == (halfArmors - count) * 2 + 1) {

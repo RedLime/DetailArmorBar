@@ -52,8 +52,13 @@ public class CustomArmorBar {
         RenderSystem.setShaderTexture(0, renderInfo.getTexture());
 
         if (isHalf) {
-            InGameDrawer.drawTexture(matrices, xPos, yPos, renderInfo.getTextureOffsetOutlineHalf().x, renderInfo.getTextureOffsetOutlineHalf().y,
-                    renderInfo.getTextureWidth(), renderInfo.getTextureHeight(), color, isMirror);
+            if (renderInfo instanceof ItemBarRenderManager) {
+                InGameDrawer.drawTexture(matrices, xPos + 4, yPos, renderInfo.getTextureOffsetOutlineHalf().x + 4, renderInfo.getTextureOffsetOutlineHalf().y, 5, 9,
+                        renderInfo.getTextureWidth(), renderInfo.getTextureHeight(), color, false);
+            } else {
+                InGameDrawer.drawTexture(matrices, xPos, yPos, renderInfo.getTextureOffsetOutlineHalf().x, renderInfo.getTextureOffsetOutlineHalf().y,
+                        renderInfo.getTextureWidth(), renderInfo.getTextureHeight(), color, isMirror);
+            }
         } else {
             InGameDrawer.drawTexture(matrices, xPos, yPos, renderInfo.getTextureOffsetOutline().x, renderInfo.getTextureOffsetOutline().y,
                     renderInfo.getTextureWidth(), renderInfo.getTextureHeight(), color, false);
