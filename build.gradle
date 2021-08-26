@@ -16,9 +16,9 @@ apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 //apply plugin: 'org.spongepowered.mixin'
 
-version = '2.2'
+version = '2.3+1.17.1-forge'
 group = 'com.redlimerl.detailab' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
-archivesBaseName = 'detailab'
+archivesBaseName = 'DetailArmorBar'
 
 // Mojang ships Java 16 to end users in 1.17+ instead of Java 8 in 1.16 or lower, so your mod should target Java 16.
 java.toolchain.languageVersion = JavaLanguageVersion.of(16)

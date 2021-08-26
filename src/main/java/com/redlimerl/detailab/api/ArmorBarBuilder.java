@@ -3,7 +3,6 @@ package com.redlimerl.detailab.api;
 import com.redlimerl.detailab.DetailArmorBar;
 import com.redlimerl.detailab.api.render.ArmorBarRenderManager;
 import com.redlimerl.detailab.api.render.CustomArmorBar;
-import net.minecraft.core.Registry;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ItemStack;
 import org.apache.logging.log4j.Level;
