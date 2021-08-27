@@ -16,7 +16,7 @@ apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 //apply plugin: 'org.spongepowered.mixin'
 
-version = '2.3+1.17.1-forge'
+version = '2.3.1+1.17.1-forge'
 group = 'com.redlimerl.detailab' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = 'DetailArmorBar'
 
