@@ -210,10 +210,10 @@ public class ArmorBarRenderer {
         var totalEnchants = Arrays.stream(protectArr).sum();
         var maxHealth = Math.max(player.getAttributeValue(EntityAttributes.GENERIC_MAX_HEALTH), playerHealth);
         var absorptionHealth = MathHelper.ceil(player.getAbsorptionAmount());
-        var resultHealth = MathHelper.ceil((maxHealth + absorptionHealth) / 20.0f);
+        var healthRow = MathHelper.ceil((maxHealth + absorptionHealth) / 20.0f);
         var screenWidth = client.getWindow().getScaledWidth() / 2 - 91;
         var screenHeight = client.getWindow().getScaledHeight() - 39;
-        var yPos = screenHeight - (resultHealth - 1) * Math.max(8 - resultHealth, 3) - 10;
+        var yPos = screenHeight - (healthRow - 1) * Math.max(10 - (healthRow - 2), 3) - 10;
 
         RenderSystem.enableBlend();
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
