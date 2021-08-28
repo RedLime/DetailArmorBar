@@ -112,6 +112,7 @@ public class ArmorBarRenderer {
                     LevelData enchantData = result.getOrDefault(enchantment, new LevelData(0, 0));
                     enchantData.count++;
                     enchantData.level += integer;
+                    if (enchantment == Enchantments.THORNS) enchantData.level += integer - 1;
                     result.put(enchantment, enchantData);
                 });
             }
@@ -269,7 +270,7 @@ public class ArmorBarRenderer {
                     Pair<ItemStack, CustomArmorBar> am = armorPoints.getOrDefault((halfArmors - count) * 2, new Pair<>(ItemStack.EMPTY, CustomArmorBar.DEFAULT));
                     if (minArmorPoints == (halfArmors - count) * 2 + 1) {
                         if (count == 0) {
-                            am.getRight().drawOutLine(am.getLeft(), matrices, xPos, yPos, true, false, lowDurColor);
+                            am.getRight().drawOutLine(am.getLeft(), matrices, xPos, yPos, true, true, lowDurColor);
                             lowDur--;
                         }
                     } else {
@@ -330,7 +331,7 @@ public class ArmorBarRenderer {
                     }
                 }
                 if (count * 2 + 1 == totalEnchants) {
-                    drawEnchantTexture(matrices, xPos, yPos, getProtectColor(protectArr), 0);
+                    drawEnchantTexture(matrices, xPos, yPos, getProtectColor(protectArr), 2);
                 }
             }
         }
