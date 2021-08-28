@@ -23,8 +23,9 @@ public class PlayerEvents {
     public static void onArmorRender(RenderGameOverlayEvent.PreLayer event) {
         if (event.getOverlay() == ForgeIngameGui.ARMOR_LEVEL_ELEMENT) {
             event.setCanceled(true);
-            if (Minecraft.getInstance().player != null) {
-                ArmorBarRenderer.INSTANCE.render(event.getMatrixStack(), Minecraft.getInstance().player);
+            var instance = Minecraft.getInstance();
+            if (instance.player != null && instance.gameMode != null && instance.gameMode.getPlayerMode().isSurvival()) {
+                ArmorBarRenderer.INSTANCE.render(event.getMatrixStack(), instance.player);
             }
         }
     }

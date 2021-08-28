@@ -21,6 +21,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
+import org.apache.logging.log4j.Level;
 
 import java.awt.*;
 import java.util.Arrays;
@@ -30,8 +31,7 @@ import java.util.Stack;
 
 import static com.redlimerl.detailab.ConfigEnumType.Animation;
 import static com.redlimerl.detailab.ConfigEnumType.ProtectionEffect;
-import static com.redlimerl.detailab.DetailArmorBar.GUI_ARMOR_BAR;
-import static com.redlimerl.detailab.DetailArmorBar.getConfig;
+import static com.redlimerl.detailab.DetailArmorBar.*;
 
 public class ArmorBarRenderer {
     static class LevelData {
@@ -40,6 +40,14 @@ public class ArmorBarRenderer {
         LevelData(int level, int count) {
             this.level = level;
             this.count = count;
+        }
+
+        @Override
+        public String toString() {
+            return "LevelData{" +
+                    "level=" + level +
+                    ", count=" + count +
+                    '}';
         }
     }
 
@@ -115,6 +123,7 @@ public class ArmorBarRenderer {
                     LevelData enchantData = result.getOrDefault(enchantment, new LevelData(0, 0));
                     enchantData.count++;
                     enchantData.level += integer;
+                    if (enchantment == Enchantments.THORNS) enchantData.level += integer - 1;
                     result.put(enchantment, enchantData);
                 });
             }
@@ -205,6 +214,7 @@ public class ArmorBarRenderer {
         var explosive = getEnchantLevel(player.getArmorSlots(), Enchantments.BLAST_PROTECTION);
         var fire = getEnchantLevel(player.getArmorSlots(), Enchantments.FIRE_PROTECTION);
         var protectArr = new int[] { generic.level + generic.count, projectile.level, explosive.level, fire.level, 0 };
+        LOGGER.log(Level.INFO, generic);
         var armorPoints = getArmorPoints(player);
         var thorns = getEnchantLevel(player.getArmorSlots(), Enchantments.THORNS);
 
@@ -274,7 +284,7 @@ public class ArmorBarRenderer {
 
                     if (minArmorPoints == (halfArmors - count) * 2 + 1) {
                         if (count == 0) {
-                            am.getSecond().drawOutLine(am.getFirst(), matrices, xPos, yPos, true, false, lowDurColor);
+                            am.getSecond().drawOutLine(am.getFirst(), matrices, xPos, yPos, true, true, lowDurColor);
                             lowDur--;
                         }
                     } else {
@@ -335,7 +345,7 @@ public class ArmorBarRenderer {
                     }
                 }
                 if (count * 2 + 1 == totalEnchants) {
-                    drawEnchantTexture(matrices, xPos, yPos, getProtectColor(protectArr), 0);
+                    drawEnchantTexture(matrices, xPos, yPos, getProtectColor(protectArr), 2);
                 }
             }
         }
