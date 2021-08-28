@@ -41,14 +41,6 @@ public class ArmorBarRenderer {
             this.level = level;
             this.count = count;
         }
-
-        @Override
-        public String toString() {
-            return "LevelData{" +
-                    "level=" + level +
-                    ", count=" + count +
-                    '}';
-        }
     }
 
     public static final ArmorBarRenderer INSTANCE = new ArmorBarRenderer();
@@ -214,7 +206,6 @@ public class ArmorBarRenderer {
         var explosive = getEnchantLevel(player.getArmorSlots(), Enchantments.BLAST_PROTECTION);
         var fire = getEnchantLevel(player.getArmorSlots(), Enchantments.FIRE_PROTECTION);
         var protectArr = new int[] { generic.level + generic.count, projectile.level, explosive.level, fire.level, 0 };
-        LOGGER.log(Level.INFO, generic);
         var armorPoints = getArmorPoints(player);
         var thorns = getEnchantLevel(player.getArmorSlots(), Enchantments.THORNS);
 
