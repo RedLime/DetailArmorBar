@@ -1,8 +1,8 @@
 package com.redlimerl.detailab.api;
 
 import com.redlimerl.detailab.api.render.CustomArmorBar;
-import net.minecraft.world.item.ArmorItem;
-import net.minecraft.world.item.Item;
+import net.minecraft.item.ArmorItem;
+import net.minecraft.item.Item;
 
 import java.util.HashMap;
 import java.util.Map;

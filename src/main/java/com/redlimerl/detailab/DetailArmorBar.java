@@ -7,17 +7,17 @@ import com.redlimerl.detailab.api.render.TextureOffset;
 import com.redlimerl.detailab.config.DABForgeConfig;
 import com.redlimerl.detailab.config.DetailArmorBarConfig;
 import com.redlimerl.detailab.screen.OptionsScreen;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.ArmorItem;
-import net.minecraft.world.item.DyeableLeatherItem;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
+import net.minecraft.item.ArmorItem;
+import net.minecraft.item.DyeableArmorItem;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.fml.ExtensionPoint;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.loading.FMLEnvironment;
-import net.minecraftforge.fmlclient.ConfigGuiHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -38,8 +38,8 @@ public class DetailArmorBar {
         if (FMLEnvironment.dist == Dist.CLIENT) {
             onInitializeClient();
             ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, DABForgeConfig.SPEC);
-            ModLoadingContext.get().registerExtensionPoint(ConfigGuiHandler.ConfigGuiFactory.class,
-                    () -> new ConfigGuiHandler.ConfigGuiFactory((mc, screen) -> new OptionsScreen(screen)));
+            ModLoadingContext.get().registerExtensionPoint(ExtensionPoint.CONFIGGUIFACTORY,
+                    () -> (mc, parent) -> new OptionsScreen(parent));
         }
     }
 
@@ -100,8 +100,8 @@ public class DetailArmorBar {
 
         DetailArmorBarAPI.customArmorBarBuilder().armor((ArmorItem) Items.LEATHER_HELMET, (ArmorItem) Items.LEATHER_LEGGINGS, (ArmorItem) Items.LEATHER_CHESTPLATE, (ArmorItem) Items.LEATHER_BOOTS)
                 .render((ItemStack itemStack) -> {
-                    var leatherArmor = ((DyeableLeatherItem) itemStack.getItem()).getColor(itemStack);
-                    var color = new Color(leatherArmor);
+                    int leatherArmor = ((DyeableArmorItem) itemStack.getItem()).getColor(itemStack);
+                    Color color = new Color(leatherArmor);
                     return new ArmorBarRenderManager(GUI_ARMOR_BAR, 128, 128,
                             new TextureOffset(117, 9), new TextureOffset(108, 9), outline, outlineHalf, color);
                 }

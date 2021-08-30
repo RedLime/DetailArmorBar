@@ -1,7 +1,7 @@
 package com.redlimerl.detailab.api.render;
 
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.ResourceLocation;
 
 import javax.annotation.Nonnull;
 import java.awt.*;
