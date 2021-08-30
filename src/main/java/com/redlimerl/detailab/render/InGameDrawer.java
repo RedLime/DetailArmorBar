@@ -7,7 +7,7 @@ import net.minecraft.util.math.Matrix4f;
 
 import java.awt.*;
 
-@SuppressWarnings({"SuspiciousNameCombination", "SameParameterValue"})
+@SuppressWarnings({"SuspiciousNameCombination", "SameParameterValue", "deprecation"})
 public class InGameDrawer {
 
     public static void drawTexture(MatrixStack matrices, int x, int y, int u, int v, Color color, boolean mirror) {
@@ -19,7 +19,7 @@ public class InGameDrawer {
     }
 
     public static void drawTexture(MatrixStack matrices, int x, int y, float u, float v, int width, int height, int textureWidth, int textureHeight, Color color, boolean mirror) {
-        RenderSystem.setShaderColor(color.getRed()/255f, color.getGreen()/255f, color.getBlue()/255f, color.getAlpha()/100f);
+        RenderSystem.color4f(color.getRed()/255f, color.getGreen()/255f, color.getBlue()/255f, color.getAlpha()/100f);
         drawTexture(matrices, x, y, width, height, u, v, width, height, textureWidth, textureHeight, mirror);
     }
 
@@ -32,9 +32,8 @@ public class InGameDrawer {
     }
 
     private static void drawTexturedQuad(Matrix4f matrices, int x0, int x1, int y0, int y1, int z, float u0, float u1, float v0, float v1, boolean mirror) {
-        RenderSystem.setShader(GameRenderer::getPositionTexShader);
         BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
-        bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE);
+        bufferBuilder.begin(7, VertexFormats.POSITION_TEXTURE);
 
         if (mirror) {
             bufferBuilder.vertex(matrices, (float)x0, (float)y1, (float)z).texture(u1, v1).next();

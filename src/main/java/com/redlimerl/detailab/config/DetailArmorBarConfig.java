@@ -3,6 +3,7 @@ package com.redlimerl.detailab.config;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.redlimerl.detailab.DetailArmorBar;
+import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -30,7 +31,7 @@ public class DetailArmorBarConfig {
     public void load() {
         if (file.exists()) {
             try {
-                options = GSON.fromJson(Files.readString(file.toPath(), StandardCharsets.UTF_8), Options.class);
+                options = GSON.fromJson(FileUtils.readFileToString(file, StandardCharsets.UTF_8), Options.class);
             } catch (IOException e) {
                 DetailArmorBar.LOGGER.error("Error loading config", e);
             }
@@ -47,7 +48,7 @@ public class DetailArmorBarConfig {
 
     public void save() {
         try {
-            Files.writeString(file.toPath(), GSON.toJson(options), StandardCharsets.UTF_8);
+            FileUtils.writeStringToFile(file, GSON.toJson(options), StandardCharsets.UTF_8);
         } catch (IOException e) {
             DetailArmorBar.LOGGER.error("Error saving config", e);
         }
@@ -69,7 +70,7 @@ public class DetailArmorBarConfig {
         public boolean toggleItemBar = true;
 
         boolean replaceInvalidOptions() {
-            var invalid = false;
+            boolean invalid = false;
             if (effectType == null) {
                 effectType = Options.DEFAULT.effectType;
                 invalid = true;

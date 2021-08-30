@@ -85,8 +85,8 @@ public class DetailArmorBar implements ClientModInitializer {
 
         DetailArmorBarAPI.customArmorBarBuilder().armor((ArmorItem) Items.LEATHER_HELMET, (ArmorItem) Items.LEATHER_LEGGINGS, (ArmorItem) Items.LEATHER_CHESTPLATE, (ArmorItem) Items.LEATHER_BOOTS)
                 .render((ItemStack itemStack) -> {
-                    var leatherArmor = ((DyeableArmorItem) itemStack.getItem()).getColor(itemStack);
-                    var color = new Color(leatherArmor);
+                    int leatherArmor = ((DyeableArmorItem) itemStack.getItem()).getColor(itemStack);
+                    Color color = new Color(leatherArmor);
                     return new ArmorBarRenderManager(GUI_ARMOR_BAR, 128, 128,
                                     new TextureOffset(117, 9), new TextureOffset(108, 9), outline, outlineHalf, color);
                 }

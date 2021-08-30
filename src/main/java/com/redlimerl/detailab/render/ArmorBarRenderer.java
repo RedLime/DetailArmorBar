@@ -8,7 +8,6 @@ import com.redlimerl.detailab.api.render.CustomArmorBar;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.hud.InGameHud;
-import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -34,6 +33,7 @@ import static com.redlimerl.detailab.ConfigEnumType.ProtectionEffect;
 import static com.redlimerl.detailab.DetailArmorBar.GUI_ARMOR_BAR;
 import static com.redlimerl.detailab.DetailArmorBar.getConfig;
 
+@SuppressWarnings("deprecation")
 public class ArmorBarRenderer {
     static class LevelData {
         int level;
@@ -49,13 +49,13 @@ public class ArmorBarRenderer {
     public static long LAST_MENDING = 0L;
 
     private static int getAnimationSpeed() {
-        return switch (getConfig().getOptions().effectSpeed) {
-            case VERY_SLOW -> 45;
-            case SLOW -> 37;
-            case FAST -> 23;
-            case VERY_FAST -> 15;
-            default -> 30;
-        };
+        switch (getConfig().getOptions().effectSpeed) {
+            case VERY_SLOW: return 45;
+            case SLOW: return 37;
+            case FAST: return 23;
+            case VERY_FAST: return 15;
+            default: return 30;
+        }
     }
 
     private static Color getProtectColor(int g, int p, int e, int f, int a) {
@@ -126,7 +126,7 @@ public class ArmorBarRenderer {
     }
 
     private int getLowDurabilityItem(Iterable<ItemStack> equipment) {
-        var count = 0;
+        int count = 0;
         for (ItemStack itemStack : equipment) {
             if (!itemStack.isEmpty()) {
                 if (itemStack.getMaxDamage() != 0 && ((itemStack.getDamage() * 100f) / (itemStack.getMaxDamage() * 100f)) >= 0.92f) {
@@ -149,7 +149,8 @@ public class ArmorBarRenderer {
             armorItem.put(armorPoints++, new Pair<>(ItemStack.EMPTY, CustomArmorBar.DEFAULT));
 
         for (ItemStack itemStack : equipment) {
-            if (!itemStack.isEmpty() && itemStack.getItem() instanceof ArmorItem armor) {
+            if (!itemStack.isEmpty() && itemStack.getItem() instanceof ArmorItem) {
+                ArmorItem armor = (ArmorItem) itemStack.getItem();
                 Multimap<EntityAttribute, EntityAttributeModifier> attributes = itemStack.getAttributeModifiers(armor.getSlotType());
 
                 CustomArmorBar barData;
@@ -180,7 +181,7 @@ public class ArmorBarRenderer {
                     if (armorPoints % 2 == 1)
                         armorItem.put(armorPoints++, new Pair<>(ItemStack.EMPTY, CustomArmorBar.EMPTY));
 
-                    var barData = DetailArmorBarAPI.getItemBarList().get(itemStack.getItem());
+                    CustomArmorBar barData = DetailArmorBarAPI.getItemBarList().get(itemStack.getItem());
                     armorItem.put(armorPoints++, new Pair<>(itemStack, barData));
                     armorItem.put(armorPoints++, new Pair<>(itemStack, barData));
                 }
@@ -197,27 +198,26 @@ public class ArmorBarRenderer {
     public void render(MatrixStack matrices, PlayerEntity player) {
         client.getProfiler().swap("armor");
 
-        var generic = getEnchantLevel(player.getArmorItems(), Enchantments.PROTECTION);
-        var projectile = getEnchantLevel(player.getArmorItems(), Enchantments.PROJECTILE_PROTECTION);
-        var explosive = getEnchantLevel(player.getArmorItems(), Enchantments.BLAST_PROTECTION);
-        var fire = getEnchantLevel(player.getArmorItems(), Enchantments.FIRE_PROTECTION);
-        var protectArr = new int[] { generic.level + generic.count, projectile.level, explosive.level, fire.level, 0 };
-        var armorPoints = getArmorPoints(player);
-        var thorns = getEnchantLevel(player.getArmorItems(), Enchantments.THORNS);
+        LevelData generic = getEnchantLevel(player.getArmorItems(), Enchantments.PROTECTION);
+        LevelData projectile = getEnchantLevel(player.getArmorItems(), Enchantments.PROJECTILE_PROTECTION);
+        LevelData explosive = getEnchantLevel(player.getArmorItems(), Enchantments.BLAST_PROTECTION);
+        LevelData fire = getEnchantLevel(player.getArmorItems(), Enchantments.FIRE_PROTECTION);
+        int[] protectArr = new int[] { generic.level + generic.count, projectile.level, explosive.level, fire.level, 0 };
+        Map<Integer, Pair<ItemStack, CustomArmorBar>> armorPoints = getArmorPoints(player);
+        LevelData thorns = getEnchantLevel(player.getArmorItems(), Enchantments.THORNS);
 
-        var playerHealth = MathHelper.ceil(player.getHealth());
-        var maxArmorPoints = armorPoints.size();
-        var minArmorPoints = Math.min(maxArmorPoints, 20);
-        var totalEnchants = Arrays.stream(protectArr).sum();
-        var maxHealth = Math.max(player.getAttributeValue(EntityAttributes.GENERIC_MAX_HEALTH), playerHealth);
-        var absorptionHealth = MathHelper.ceil(player.getAbsorptionAmount());
-        var healthRow = MathHelper.ceil((maxHealth + absorptionHealth) / 20.0f);
-        var screenWidth = client.getWindow().getScaledWidth() / 2 - 91;
-        var screenHeight = client.getWindow().getScaledHeight() - 39;
-        var yPos = screenHeight - (healthRow - 1) * Math.max(10 - (healthRow - 2), 3) - 10;
+        int playerHealth = MathHelper.ceil(player.getHealth());
+        int maxArmorPoints = armorPoints.size();
+        int minArmorPoints = Math.min(maxArmorPoints, 20);
+        int totalEnchants = Arrays.stream(protectArr).sum();
+        double maxHealth = Math.max(player.getAttributeValue(EntityAttributes.GENERIC_MAX_HEALTH), playerHealth);
+        int absorptionHealth = MathHelper.ceil(player.getAbsorptionAmount());
+        int healthRow = MathHelper.ceil((maxHealth + absorptionHealth) / 20.0f);
+        int screenWidth = client.getWindow().getScaledWidth() / 2 - 91;
+        int screenHeight = client.getWindow().getScaledHeight() - 39;
+        int yPos = screenHeight - (healthRow - 1) * Math.max(10 - (healthRow - 2), 3) - 10;
 
         RenderSystem.enableBlend();
-        RenderSystem.setShader(GameRenderer::getPositionTexShader);
 
         //Default
         if (maxArmorPoints > 0) {
@@ -262,7 +262,7 @@ public class ArmorBarRenderer {
 
             if (minArmorPoints != 0 && lowDur != 0) {
                 Color lowDurColor = getLowDurabilityColor();
-                var halfArmors = (int) Math.ceil(minArmorPoints / 2.0) - 1;
+                int halfArmors = (int) Math.ceil(minArmorPoints / 2.0) - 1;
                 for (int count = 0; count < halfArmors; count++) {
                     if (lowDur <= 0) break;
 
@@ -288,8 +288,8 @@ public class ArmorBarRenderer {
 
         //Mending Color
         if (getConfig().getOptions().toggleMending && minArmorPoints != 0) {
-            var mendingTime = DetailArmorBar.getTicks() - LAST_MENDING;
-            var mendingSpeed = 3;
+            long mendingTime = DetailArmorBar.getTicks() - LAST_MENDING;
+            int mendingSpeed = 3;
 
             if (mendingTime < (mendingSpeed * 4)) {
                 for (int count = 0; count < 10; count++) {
@@ -303,15 +303,15 @@ public class ArmorBarRenderer {
             }
         }
 
-        RenderSystem.setShaderTexture(0, GUI_ARMOR_BAR);
+        client.getTextureManager().bindTexture(GUI_ARMOR_BAR);
 
         //Armor Enchantments
         if (getConfig().getOptions().toggleEnchants && totalEnchants > 0 && maxArmorPoints > 0) {
             for (int count = 0; count * 2 + 1 <= totalEnchants; count++) {
-                var xPos = screenWidth + count * 8;
+                int xPos = screenWidth + count * 8;
                 if (count * 2 + 1 < totalEnchants) {
-                    var min = -1;
-                    var max = -1;
+                    int min = -1;
+                    int max = -1;
                     for (int pw = 0; pw < 5; pw++) {
                         if (min == -1 && protectArr[pw] > 1) {
                             min = pw;
@@ -354,14 +354,14 @@ public class ArmorBarRenderer {
 
 
         RenderSystem.disableBlend();
-        RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
-        RenderSystem.setShaderTexture(0, DrawableHelper.GUI_ICONS_TEXTURE);
+        RenderSystem.color4f(1f, 1f, 1f, 1f);
+        client.getTextureManager().bindTexture(DrawableHelper.GUI_ICONS_TEXTURE);
     }
 
     private void drawEnchantTexture(MatrixStack matrices, int x, int y, Color color, int half) {
         int u = 0;
         int v = 0;
-        var t = (hud.getTicks()/3) % 36;
+        int t = (hud.getTicks()/3) % 36;
 
         if (getConfig().getOptions().effectType == ProtectionEffect.AURA) {
             if (t < 12) {

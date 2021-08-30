@@ -3,6 +3,7 @@ package com.redlimerl.detailab.api.render;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.redlimerl.detailab.DetailArmorBar;
 import com.redlimerl.detailab.render.InGameDrawer;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
 
@@ -34,7 +35,7 @@ public class CustomArmorBar {
         BarRenderManager renderInfo = predicate.apply(itemStack);
         if (renderInfo.isShown()) return;
 
-        RenderSystem.setShaderTexture(0, renderInfo.getTexture());
+        MinecraftClient.getInstance().getTextureManager().bindTexture(renderInfo.getTexture());
 
         if (isHalf) {
             InGameDrawer.drawTexture(matrices, xPos, yPos, renderInfo.getTextureOffsetHalf().x, renderInfo.getTextureOffsetHalf().y,
@@ -49,7 +50,7 @@ public class CustomArmorBar {
         BarRenderManager renderInfo = predicate.apply(itemStack);
         if (renderInfo.isShown()) return;
 
-        RenderSystem.setShaderTexture(0, renderInfo.getTexture());
+        MinecraftClient.getInstance().getTextureManager().bindTexture(renderInfo.getTexture());
 
         if (isHalf) {
             if (renderInfo instanceof ItemBarRenderManager) {
