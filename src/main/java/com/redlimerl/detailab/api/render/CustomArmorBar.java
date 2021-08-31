@@ -1,7 +1,6 @@
 package com.redlimerl.detailab.api.render;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.redlimerl.detailab.DetailArmorBar;
 import com.redlimerl.detailab.render.InGameDrawer;
 import net.minecraft.client.Minecraft;
