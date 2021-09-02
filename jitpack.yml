@@ -1,8 +1,8 @@
 jdk:
   - openjdk16
 before_install:
-  - echo "Before Install"
-  - ./ensure-java-16 install
+  - wget https://github.com/sormuras/bach/raw/master/install-jdk.sh
+  - source ./install-jdk.sh --feature 16 --license GPL
 install:
   - echo "Install"
   - if ! ./ensure-java-16 use; then source ~/.sdkman/bin/sdkman-init.sh; fi
