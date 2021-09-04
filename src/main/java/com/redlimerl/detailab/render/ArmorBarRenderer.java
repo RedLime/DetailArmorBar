@@ -236,9 +236,7 @@ public class ArmorBarRenderer {
                 if (count * 2 + 1 + stackRow < totalArmorPoint) {
                     Pair<ItemStack, CustomArmorBar> am1 = armorPoints.getOrDefault(count * 2 + stackRow, new Pair<>(ItemStack.EMPTY, CustomArmorBar.DEFAULT));
                     Pair<ItemStack, CustomArmorBar> am2 = armorPoints.getOrDefault(count * 2 + 1 + stackRow, new Pair<>(ItemStack.EMPTY, CustomArmorBar.DEFAULT));
-                    if (am1 == am2 || (am1.getFirst().getItem() instanceof ArmorItem && ((ArmorItem) am1.getFirst().getItem()).getMaterial() ==
-                            (am2.getFirst().getItem() instanceof ArmorItem ? ((ArmorItem) am2.getFirst().getItem()).getMaterial() : null)
-                    )) {
+                    if (am1 == am2 || (am1.getSecond() == am2.getSecond())) {
                         am1.getSecond().draw(am1.getFirst(), matrices, xPos, yPos, false, false);
                     } else {
                         am2.getSecond().draw(am2.getFirst(), matrices, xPos, yPos, true, true);
