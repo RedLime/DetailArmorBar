@@ -269,7 +269,7 @@ public class ArmorBarRenderer {
                 if (lowDurColor.getAlpha() != 0) {
                     int armorPreset = ((totalArmorPoint - 1) % 20) + 1;
                     int halfArmors = (int) Math.ceil(armorPreset / 2.0) - 1;
-                    for (int count = 0; count < halfArmors + 1; count++) {
+                    for (int count = 0; count <= halfArmors; count++) {
                         if (lowDur == 0) break;
 
                         int xPos = screenWidth + (halfArmors - count) * 8;
