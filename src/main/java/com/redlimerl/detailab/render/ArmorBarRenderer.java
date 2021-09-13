@@ -22,6 +22,7 @@ import net.minecraft.item.ArmorMaterials;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Pair;
 import net.minecraft.util.math.MathHelper;
+import org.apache.logging.log4j.Level;
 
 import java.awt.*;
 import java.util.Arrays;
@@ -31,8 +32,7 @@ import java.util.Stack;
 
 import static com.redlimerl.detailab.ConfigEnumType.Animation;
 import static com.redlimerl.detailab.ConfigEnumType.ProtectionEffect;
-import static com.redlimerl.detailab.DetailArmorBar.GUI_ARMOR_BAR;
-import static com.redlimerl.detailab.DetailArmorBar.getConfig;
+import static com.redlimerl.detailab.DetailArmorBar.*;
 
 public class ArmorBarRenderer {
     static class LevelData {
@@ -264,7 +264,7 @@ public class ArmorBarRenderer {
                 if (lowDurColor.getAlpha() != 0) {
                     int armorPreset = ((totalArmorPoint - 1) % 20) + 1;
                     int halfArmors = (int) Math.ceil(armorPreset / 2.0) - 1;
-                    for (int count = 0; count < halfArmors + 1; count++) {
+                    for (int count = 0; count <= halfArmors; count++) {
                         if (lowDur <= 0) break;
 
                         int xPos = screenWidth + (halfArmors - count) * 8;
