@@ -12,7 +12,7 @@ import java.util.function.Function;
 public class CustomArmorBar {
 
     public static CustomArmorBar DEFAULT = new CustomArmorBar(itemStack -> new ArmorBarRenderManager(DetailArmorBar.GUI_ARMOR_BAR, 128, 128,
-            new TextureOffset(63, 9), new TextureOffset(54, 9), new TextureOffset(27, 0), new TextureOffset(9, 0)));
+            new TextureOffset(63, 9), new TextureOffset(54, 9), new TextureOffset(9, 0), new TextureOffset(27, 0)));
     public static CustomArmorBar EMPTY = new CustomArmorBar(itemStack -> {
         if (DetailArmorBar.getConfig().getOptions().toggleEmptyBar) {
             return new ArmorBarRenderManager(DetailArmorBar.GUI_ARMOR_BAR, 128, 128,
