@@ -21,6 +21,7 @@ import net.minecraft.item.ArmorMaterials;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Pair;
 import net.minecraft.util.math.MathHelper;
+import org.apache.logging.log4j.Level;
 
 import java.awt.*;
 import java.util.Arrays;
@@ -30,8 +31,7 @@ import java.util.Stack;
 
 import static com.redlimerl.detailab.ConfigEnumType.Animation;
 import static com.redlimerl.detailab.ConfigEnumType.ProtectionEffect;
-import static com.redlimerl.detailab.DetailArmorBar.GUI_ARMOR_BAR;
-import static com.redlimerl.detailab.DetailArmorBar.getConfig;
+import static com.redlimerl.detailab.DetailArmorBar.*;
 
 @SuppressWarnings("deprecation")
 public class ArmorBarRenderer {
@@ -231,7 +231,7 @@ public class ArmorBarRenderer {
                 if (count * 2 + 1 + stackRow < totalArmorPoint) {
                     Pair<ItemStack, CustomArmorBar> am1 = armorPoints.getOrDefault(count * 2 + stackRow, new Pair<>(ItemStack.EMPTY, CustomArmorBar.DEFAULT));
                     Pair<ItemStack, CustomArmorBar> am2 = armorPoints.getOrDefault(count * 2 + 1 + stackRow, new Pair<>(ItemStack.EMPTY, CustomArmorBar.DEFAULT));
-                    if (am1 == am2 || (am1.getRight() == am2.getRight())) {
+                    if (am1.getRight() == am2.getRight()) {
                         am1.getRight().draw(am1.getLeft(), matrices, xPos, yPos, false, false);
                     } else {
                         am2.getRight().draw(am2.getLeft(), matrices, xPos, yPos, true, true);

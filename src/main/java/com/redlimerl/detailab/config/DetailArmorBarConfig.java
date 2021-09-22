@@ -67,6 +67,7 @@ public class DetailArmorBarConfig {
         public boolean toggleMending = true;
         public boolean toggleEmptyBar = true;
         public boolean toggleItemBar = true;
+        public boolean toggleVanillaTexture = true;
 
         boolean replaceInvalidOptions() {
             boolean invalid = false;

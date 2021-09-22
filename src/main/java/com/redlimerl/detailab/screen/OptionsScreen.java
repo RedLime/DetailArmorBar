@@ -111,6 +111,13 @@ public class OptionsScreen extends Screen {
         }, (button, matrices, mouseX, mouseY) -> renderTooltip(matrices, getToggleDescription("empty_bar"), mouseX, mouseY)));
         buttonCount++;
 
+        addButton(new ButtonWidget(width / 2 - 155 + buttonCount % 2 * 160, height / 6 - 12 + 24 * (buttonCount / 2), 150, 20,
+                getToggleName("vanilla_texture", getConfig().getOptions().toggleVanillaTexture), (button) -> {
+            getConfig().getOptions().toggleVanillaTexture = !getConfig().getOptions().toggleVanillaTexture; getConfig().save();
+            button.setMessage(getToggleName("vanilla_texture", getConfig().getOptions().toggleVanillaTexture));
+        }, (button, matrices, mouseX, mouseY) -> renderTooltip(matrices, getToggleDescription("vanilla_texture"), mouseX, mouseY)));
+        buttonCount++;
+
         addButton(new ButtonWidget(width / 2 - 100, height / 6 + 168, 200, 20, ScreenTexts.DONE, (matrixStack) -> {
             if (client != null) {
                 client.openScreen(parent);
