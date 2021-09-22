@@ -103,6 +103,13 @@ public class OptionsScreen extends Screen {
         }, (button, matrices, mouseX, mouseY) -> renderTooltip(matrices, getToggleDescription("empty_bar"), Optional.empty(), mouseX, mouseY)));
         buttonCount++;
 
+        addRenderableWidget(new Button(width / 2 - 155 + buttonCount % 2 * 160, height / 6 - 12 + 24 * (buttonCount / 2), 150, 20,
+                getToggleName("vanilla_texture", getConfig().getOptions().toggleVanillaTexture), (button) -> {
+            getConfig().getOptions().toggleVanillaTexture = !getConfig().getOptions().toggleVanillaTexture; getConfig().save();
+            button.setMessage(getToggleName("vanilla_texture", getConfig().getOptions().toggleVanillaTexture));
+        }, (button, matrices, mouseX, mouseY) -> renderTooltip(matrices, getToggleDescription("vanilla_texture"), Optional.empty(), mouseX, mouseY)));
+        buttonCount++;
+
         addRenderableWidget(new Button(width / 2 - 100, height / 6 + 168, 200, 20, CommonComponents.GUI_DONE, (matrixStack) -> {
             if (this.minecraft != null) {
                 this.minecraft.setScreen(parent);

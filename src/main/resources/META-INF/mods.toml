@@ -7,6 +7,7 @@ version="${file.jarVersion}"
 displayName="Detail Armor Bar"
 logoFile="icon.png"
 authors="RedLime"
+credits="snessim, Heamaci"
 description='''Show more details of armors in Armor bar!'''
 displayURL="https://github.com/RedLime/DetailArmorBar/tree/1.17-forge"
 [[dependencies.detailab]]
