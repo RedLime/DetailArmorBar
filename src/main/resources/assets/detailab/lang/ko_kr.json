@@ -38,5 +38,7 @@
   "option.detailarmorbar.toggle.item_types": "특수 아이템 갑옷바",
   "context.detailarmorbar.toggle.item_types": "특수 아이템을 장착 시,/갑옷바에 표시합니다 (예: 겉날개)",
   "option.detailarmorbar.toggle.empty_bar": "빈 갑옷바 표시",
-  "context.detailarmorbar.toggle.empty_bar": "빈 갑옷바를 표시합니다."
+  "context.detailarmorbar.toggle.empty_bar": "빈 갑옷바를 표시합니다.",
+  "option.detailarmorbar.toggle.vanilla_texture": "바닐라 텍스쳐 스타일",
+  "context.detailarmorbar.toggle.vanilla_texture": "아머바를 바닐라 스타일의 텍스쳐로 표시합니다./OFF일 경우, 고급 텍스쳐가 적용됩니다./제공: Heamaci, snessim"
 }
