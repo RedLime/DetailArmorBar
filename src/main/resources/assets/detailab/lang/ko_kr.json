@@ -1,4 +1,7 @@
 {
+  "option.detailarmorbar.title.features": "기능",
+  "option.detailarmorbar.title.animation": "애니메이션",
+  "option.detailarmorbar.title.etc": "기타..",
   "option.detailarmorbar.effects.effect_type": "보호 효과 종류",
   "context.detailarmorbar.effects.effect_type": "보호 인챈트 효과를 종류를 변경합니다.",
   "option.detailarmorbar.effects.effect_type.aura": "아우라",
@@ -40,5 +43,11 @@
   "option.detailarmorbar.toggle.empty_bar": "빈 갑옷바 표시",
   "context.detailarmorbar.toggle.empty_bar": "빈 갑옷바를 표시합니다.",
   "option.detailarmorbar.toggle.vanilla_texture": "바닐라 텍스쳐 스타일",
-  "context.detailarmorbar.toggle.vanilla_texture": "아머바를 바닐라 스타일의 텍스쳐로 표시합니다./OFF일 경우, 고급 텍스쳐가 적용됩니다./제공: Heamaci, snessim"
+  "context.detailarmorbar.toggle.vanilla_texture": "아머바를 바닐라 스타일의 텍스쳐로 표시합니다./OFF일 경우, 고급 텍스쳐가 적용됩니다./제공: Heamaci, snessim",
+  "option.detailarmorbar.toggle.compatible_heart_mod": "호환 모드",
+  "context.detailarmorbar.toggle.compatible_heart_mod": "체력이 한 줄로 표시되는 모드와 호환되게 만듭니다./갑옷바가 혼자 위로 뜨는 현상을 막습니다.",
+  "option.detailarmorbar.toggle.inverse_slot": "슬롯 반전",
+  "context.detailarmorbar.toggle.inverse_slot": "아머바의 슬롯 순서를 반전합니다.",
+  "option.detailarmorbar.toggle.sort_special_item": "특수 아이템 정렬",
+  "context.detailarmorbar.toggle.sort_special_item": "특수 아이템(Elytra 같은)을 오른쪽에 정렬합니다."
 }
