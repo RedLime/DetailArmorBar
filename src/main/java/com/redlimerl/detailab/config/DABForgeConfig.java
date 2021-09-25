@@ -2,7 +2,7 @@ package com.redlimerl.detailab.config;
 
 import net.minecraftforge.common.ForgeConfigSpec;
 
-import static com.redlimerl.detailab.ConfigEnumType.*;
+import static com.redlimerl.detailab.config.ConfigEnumType.*;
 
 public class DABForgeConfig {
     public static final ForgeConfigSpec.Builder BUILDER = new ForgeConfigSpec.Builder();

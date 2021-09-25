@@ -14,6 +14,7 @@ import net.minecraft.item.Items;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.ExtensionPoint;
+import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
@@ -31,6 +32,7 @@ public class DetailArmorBar {
     public final static Logger LOGGER = LogManager.getLogger("DetailArmorBar");
     public final static String MOD_ID = "detailab";
     public final static ResourceLocation GUI_ARMOR_BAR = new ResourceLocation(MOD_ID, "textures/armor_bar.png");
+    private final static String[] compatibilityMods = { "healthoverlay" };
 
     private static DetailArmorBarConfig config = null;
 
@@ -112,9 +114,15 @@ public class DetailArmorBar {
             new ItemBarRenderManager(GUI_ARMOR_BAR, 128, 128,
                     new TextureOffset(36, 0), new TextureOffset(54, 0), true)
         ).register();
+
+        for (String compatibilityMod : compatibilityMods) {
+            if (ModList.get().getModObjectById(compatibilityMod).isPresent()) {
+                getConfig().getOptions().toggleCompatibleHeartMod = true;
+            }
+        }
     }
 
-    private static int isVanillaTexture() {
+    public static int isVanillaTexture() {
         return getConfig().getOptions().toggleVanillaTexture ? 45 : 0;
     }
 }

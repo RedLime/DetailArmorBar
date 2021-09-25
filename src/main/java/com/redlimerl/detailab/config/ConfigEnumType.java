@@ -1,4 +1,4 @@
-package com.redlimerl.detailab;
+package com.redlimerl.detailab.config;
 
 public class ConfigEnumType {
     public enum ProtectionEffect {

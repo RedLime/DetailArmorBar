@@ -8,7 +8,7 @@
 //
 //import java.util.Locale;
 //
-//import static com.redlimerl.detailab.ConfigEnumType.*;
+//import static com.redlimerl.detailab.config.ConfigEnumType.*;
 //
 //public class ModMenuConfigImpl  {
 //
