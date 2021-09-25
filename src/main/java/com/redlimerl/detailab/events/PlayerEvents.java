@@ -1,5 +1,6 @@
-package com.redlimerl.detailab;
+package com.redlimerl.detailab.events;
 
+import com.redlimerl.detailab.DetailArmorBar;
 import com.redlimerl.detailab.render.ArmorBarRenderer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.EquipmentSlot;

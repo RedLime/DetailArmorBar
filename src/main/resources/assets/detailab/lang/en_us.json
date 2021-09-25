@@ -1,4 +1,7 @@
 {
+  "option.detailarmorbar.title.features": "Features",
+  "option.detailarmorbar.title.animation": "Animations",
+  "option.detailarmorbar.title.etc": "etc..",
   "option.detailarmorbar.effects.effect_type": "Protection Effect",
   "context.detailarmorbar.effects.effect_type": "Changes the type of/protection enchantment effect.",
   "option.detailarmorbar.effects.effect_type.aura": "Aura",
@@ -40,5 +43,11 @@
   "option.detailarmorbar.toggle.empty_bar": "Empty Armor Bar",
   "context.detailarmorbar.toggle.empty_bar": "Shows an empty armor bar.",
   "option.detailarmorbar.toggle.vanilla_texture": "Vanilla Style Texture",
-  "context.detailarmorbar.toggle.vanilla_texture": "Displays armor bars with vanilla-style textures./When OFF, displays better texture but different with original./credit: Heamaci, snessim"
+  "context.detailarmorbar.toggle.vanilla_texture": "Displays armor bars with vanilla-style textures./When OFF, displays better texture but different with original./credit: Heamaci, snessim",
+  "option.detailarmorbar.toggle.compatible_heart_mod": "Compatibility Mode",
+  "context.detailarmorbar.toggle.compatible_heart_mod": "Makes it compatible with mods/that health is displayed as a single line./Prevents the armor bar moving upwards.",
+  "option.detailarmorbar.toggle.inverse_slot": "Reversed Slot",
+  "context.detailarmorbar.toggle.inverse_slot": "Reverses the slot order of the armor bar.",
+  "option.detailarmorbar.toggle.sort_special_item": "Sort Special Items",
+  "context.detailarmorbar.toggle.sort_special_item": "Sort special items (like Elytra) to the right on armor bar."
 }

@@ -13,10 +13,13 @@ import net.minecraft.world.item.DyeableLeatherItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
+import net.minecraftforge.fml.javafmlmod.FMLModContainer;
 import net.minecraftforge.fml.loading.FMLEnvironment;
+import net.minecraftforge.fml.loading.FMLLoader;
 import net.minecraftforge.fmlclient.ConfigGuiHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -31,6 +34,7 @@ public class DetailArmorBar {
     public final static Logger LOGGER = LogManager.getLogger("DetailArmorBar");
     public final static String MOD_ID = "detailab";
     public final static ResourceLocation GUI_ARMOR_BAR = new ResourceLocation(MOD_ID, "textures/armor_bar.png");
+    private final static String[] compatibilityMods = { "healthoverlay" };
 
     private static DetailArmorBarConfig config = null;
 
@@ -112,9 +116,15 @@ public class DetailArmorBar {
             new ItemBarRenderManager(GUI_ARMOR_BAR, 128, 128,
                     new TextureOffset(36, 0), new TextureOffset(54, 0), true)
         ).register();
+
+        for (String compatibilityMod : compatibilityMods) {
+            if (ModList.get().getModObjectById(compatibilityMod).isPresent()) {
+                getConfig().getOptions().toggleCompatibleHeartMod = true;
+            }
+        }
     }
 
-    private static int isVanillaTexture() {
+    public static int isVanillaTexture() {
         return getConfig().getOptions().toggleVanillaTexture ? 45 : 0;
     }
 }
