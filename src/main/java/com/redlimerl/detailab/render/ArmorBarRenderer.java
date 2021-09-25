@@ -24,11 +24,13 @@ import net.minecraft.util.Pair;
 import net.minecraft.util.math.MathHelper;
 
 import java.awt.*;
-import java.util.*;
 import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
-import static com.redlimerl.detailab.config.ConfigEnumType.*;
 import static com.redlimerl.detailab.DetailArmorBar.*;
+import static com.redlimerl.detailab.config.ConfigEnumType.Animation;
+import static com.redlimerl.detailab.config.ConfigEnumType.ProtectionEffect;
 
 @SuppressWarnings("deprecation")
 public class ArmorBarRenderer {
@@ -44,6 +46,8 @@ public class ArmorBarRenderer {
     public static final ArmorBarRenderer INSTANCE = new ArmorBarRenderer();
     public static long LAST_THORNS = 0L;
     public static long LAST_MENDING = 0L;
+    private static final UUID[] MODIFIERS = new UUID[]{UUID.fromString("845DB27C-C624-495F-8C9F-6020A9A58B6B"), UUID.fromString("D8499B04-0E66-4726-AB29-64469D734E0D"), UUID.fromString("9F3D476D-C118-4544-8365-64846904B48E"), UUID.fromString("2AD3F246-FEE1-4E67-B886-69FD380BB150")};
+
 
     private static int getAnimationSpeed() {
         switch (getConfig().getOptions().effectSpeed) {
@@ -152,7 +156,7 @@ public class ArmorBarRenderer {
             }
 
             for (EntityAttributeModifier entityAttributeModifier : attribute.getModifiers()) {
-                if (!entityAttributeModifier.getName().equals("Armor modifier")) {
+                if (!Arrays.stream(MODIFIERS).collect(Collectors.toList()).contains(entityAttributeModifier.getId())) {
                     for (int i = 0; i < entityAttributeModifier.getValue(); i++) {
                         armorItem.add(new Pair<>(ItemStack.EMPTY, CustomArmorBar.DEFAULT));
                     }
@@ -207,7 +211,8 @@ public class ArmorBarRenderer {
         ArmorItem armorItem = (ArmorItem) itemStack.getItem();
         Multimap<EntityAttribute, EntityAttributeModifier> attributes = itemStack.getAttributeModifiers(armorItem.getSlotType());
         if (attributes.containsKey(EntityAttributes.GENERIC_ARMOR)) {
-            return attributes.get(EntityAttributes.GENERIC_ARMOR).stream().mapToInt(att -> (int) att.getValue()).sum();
+            return attributes.get(EntityAttributes.GENERIC_ARMOR).stream()
+                    .filter(att -> Arrays.stream(MODIFIERS).collect(Collectors.toList()).contains(att.getId())).mapToInt(att -> (int) att.getValue()).sum();
         } else {
             return armorItem.getProtection();
         }
@@ -239,13 +244,13 @@ public class ArmorBarRenderer {
         int screenHeight = client.getWindow().getScaledHeight() - 39;
         int yPos = screenHeight - (healthRow - 1) * Math.max(10 - (healthRow - 2), 3) - 10;
 
+        int stackCount = (totalArmorPoint - 1) / 20;
+        int stackRow = stackCount * 20;
+
         RenderSystem.enableBlend();
 
         //Default
         if (totalArmorPoint > 0) {
-            int stackCount = (totalArmorPoint - 1) / 20;
-            int stackRow = stackCount * 20;
-
             for (int count = 0; count < 10; count++) {
                 int xPos = screenWidth + count * 8;
 
@@ -289,7 +294,7 @@ public class ArmorBarRenderer {
                         if (lowDur <= 0) break;
 
                         int xPos = screenWidth + (halfArmors - count) * 8;
-                        Pair<ItemStack, CustomArmorBar> am = armorPoints.get((halfArmors - count) * 2);
+                        Pair<ItemStack, CustomArmorBar> am = armorPoints.get((halfArmors - count) * 2 + stackRow);
                         if (armorPreset == (halfArmors - count) * 2 + 1) {
                             if (count == 0) {
                                 am.getRight().drawOutLine(am.getLeft(), matrices, xPos, yPos, true, false, lowDurColor);
@@ -319,8 +324,13 @@ public class ArmorBarRenderer {
                     if (mendingTime % (mendingSpeed * 2) < mendingSpeed) {
                         int xPos = screenWidth + count * 8;
 
-                        Pair<ItemStack, CustomArmorBar> am = armorPoints.get(count * 2);
-                        am.getRight().drawOutLine(am.getLeft(), matrices, xPos, yPos, false, false, Color.WHITE);
+                        if (armorPoints.size() <= count * 2 + stackRow) {
+                            if (getConfig().getOptions().toggleEmptyBar)
+                                CustomArmorBar.DEFAULT.drawOutLine(ItemStack.EMPTY, matrices, xPos, yPos, false, false, Color.WHITE);
+                        } else {
+                            Pair<ItemStack, CustomArmorBar> am = armorPoints.get(count * 2 + stackRow);
+                            am.getRight().drawOutLine(am.getLeft(), matrices, xPos, yPos, false, false, Color.WHITE);
+                        }
                     }
                 }
             }
