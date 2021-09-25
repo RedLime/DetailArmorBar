@@ -23,7 +23,6 @@ import net.minecraft.item.ArmorMaterials;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Pair;
 import net.minecraft.util.math.MathHelper;
-import org.apache.logging.log4j.Level;
 
 import java.awt.*;
 import java.util.List;
@@ -156,7 +155,6 @@ public class ArmorBarRenderer {
             }
 
             for (EntityAttributeModifier entityAttributeModifier : attribute.getModifiers()) {
-                LOGGER.log(Level.INFO, entityAttributeModifier.toString());
                 if (!Arrays.stream(MODIFIERS).toList().contains(entityAttributeModifier.getId())) {
                     for (int i = 0; i < entityAttributeModifier.getValue(); i++) {
                         armorItem.add(new Pair<>(ItemStack.EMPTY, CustomArmorBar.DEFAULT));
