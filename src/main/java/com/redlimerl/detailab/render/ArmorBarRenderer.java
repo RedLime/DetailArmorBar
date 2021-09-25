@@ -25,12 +25,13 @@ import net.minecraft.util.Pair;
 import net.minecraft.util.math.MathHelper;
 
 import java.awt.*;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 
+import static com.redlimerl.detailab.DetailArmorBar.GUI_ARMOR_BAR;
+import static com.redlimerl.detailab.DetailArmorBar.getConfig;
 import static com.redlimerl.detailab.config.ConfigEnumType.Animation;
 import static com.redlimerl.detailab.config.ConfigEnumType.ProtectionEffect;
-import static com.redlimerl.detailab.DetailArmorBar.*;
 
 public class ArmorBarRenderer {
     static class LevelData {
@@ -153,7 +154,7 @@ public class ArmorBarRenderer {
             }
 
             for (EntityAttributeModifier entityAttributeModifier : attribute.getModifiers()) {
-                if (!entityAttributeModifier.getName().equals("Armor modifier")) {
+                if (!entityAttributeModifier.getName().equals("Armor modifier") && !entityAttributeModifier.getName().equals("generic.armor")) {
                     for (int i = 0; i < entityAttributeModifier.getValue(); i++) {
                         armorItem.add(new Pair<>(ItemStack.EMPTY, CustomArmorBar.DEFAULT));
                     }
@@ -239,13 +240,14 @@ public class ArmorBarRenderer {
         var screenHeight = client.getWindow().getScaledHeight() - 39;
         var yPos = screenHeight - (healthRow - 1) * Math.max(10 - (healthRow - 2), 3) - 10;
 
+        int stackCount = (totalArmorPoint - 1) / 20;
+        int stackRow = stackCount * 20;
+
         RenderSystem.enableBlend();
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
 
         //Default
         if (totalArmorPoint > 0) {
-            int stackCount = (totalArmorPoint - 1) / 20;
-            int stackRow = stackCount * 20;
 
             for (int count = 0; count < 10; count++) {
                 int xPos = screenWidth + count * 8;
@@ -290,7 +292,7 @@ public class ArmorBarRenderer {
                         if (lowDur <= 0) break;
 
                         int xPos = screenWidth + (halfArmors - count) * 8;
-                        Pair<ItemStack, CustomArmorBar> am = armorPoints.get((halfArmors - count) * 2);
+                        Pair<ItemStack, CustomArmorBar> am = armorPoints.get((halfArmors - count) * 2 + stackRow);
                         if (armorPreset == (halfArmors - count) * 2 + 1) {
                             if (count == 0) {
                                 am.getRight().drawOutLine(am.getLeft(), matrices, xPos, yPos, true, false, lowDurColor);
@@ -320,8 +322,13 @@ public class ArmorBarRenderer {
                     if (mendingTime % (mendingSpeed * 2) < mendingSpeed) {
                         int xPos = screenWidth + count * 8;
 
-                        Pair<ItemStack, CustomArmorBar> am = armorPoints.get(count * 2);
-                        am.getRight().drawOutLine(am.getLeft(), matrices, xPos, yPos, false, false, Color.WHITE);
+                        if (armorPoints.size() <= count * 2 + stackRow) {
+                            if (getConfig().getOptions().toggleEmptyBar)
+                                CustomArmorBar.DEFAULT.drawOutLine(ItemStack.EMPTY, matrices, xPos, yPos, false, false, Color.WHITE);
+                        } else {
+                            Pair<ItemStack, CustomArmorBar> am = armorPoints.get(count * 2 + stackRow);
+                            am.getRight().drawOutLine(am.getLeft(), matrices, xPos, yPos, false, false, Color.WHITE);
+                        }
                     }
                 }
             }
