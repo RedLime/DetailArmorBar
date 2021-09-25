@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 
-import static com.redlimerl.detailab.ConfigEnumType.*;
+import static com.redlimerl.detailab.config.ConfigEnumType.*;
 
 public class DetailArmorBarConfig {
 
@@ -68,6 +68,9 @@ public class DetailArmorBarConfig {
         public boolean toggleEmptyBar = true;
         public boolean toggleItemBar = true;
         public boolean toggleVanillaTexture = true;
+        public boolean toggleCompatibleHeartMod = false;
+        public boolean toggleInverseSlot = false;
+        public boolean toggleSortSpecialItem = true;
 
         boolean replaceInvalidOptions() {
             var invalid = false;
