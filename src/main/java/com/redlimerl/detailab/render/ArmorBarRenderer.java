@@ -23,13 +23,13 @@ import net.minecraft.item.ArmorMaterials;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Pair;
 import net.minecraft.util.math.MathHelper;
+import org.apache.logging.log4j.Level;
 
 import java.awt.*;
 import java.util.List;
 import java.util.*;
 
-import static com.redlimerl.detailab.DetailArmorBar.GUI_ARMOR_BAR;
-import static com.redlimerl.detailab.DetailArmorBar.getConfig;
+import static com.redlimerl.detailab.DetailArmorBar.*;
 import static com.redlimerl.detailab.config.ConfigEnumType.Animation;
 import static com.redlimerl.detailab.config.ConfigEnumType.ProtectionEffect;
 
@@ -46,6 +46,8 @@ public class ArmorBarRenderer {
     public static final ArmorBarRenderer INSTANCE = new ArmorBarRenderer();
     public static long LAST_THORNS = 0L;
     public static long LAST_MENDING = 0L;
+    private static final UUID[] MODIFIERS = new UUID[]{UUID.fromString("845DB27C-C624-495F-8C9F-6020A9A58B6B"), UUID.fromString("D8499B04-0E66-4726-AB29-64469D734E0D"), UUID.fromString("9F3D476D-C118-4544-8365-64846904B48E"), UUID.fromString("2AD3F246-FEE1-4E67-B886-69FD380BB150")};
+
 
     private static int getAnimationSpeed() {
         return switch (getConfig().getOptions().effectSpeed) {
@@ -154,7 +156,8 @@ public class ArmorBarRenderer {
             }
 
             for (EntityAttributeModifier entityAttributeModifier : attribute.getModifiers()) {
-                if (!entityAttributeModifier.getName().equals("Armor modifier") && !entityAttributeModifier.getName().equals("generic.armor")) {
+                LOGGER.log(Level.INFO, entityAttributeModifier.toString());
+                if (!Arrays.stream(MODIFIERS).toList().contains(entityAttributeModifier.getId())) {
                     for (int i = 0; i < entityAttributeModifier.getValue(); i++) {
                         armorItem.add(new Pair<>(ItemStack.EMPTY, CustomArmorBar.DEFAULT));
                     }
@@ -208,7 +211,8 @@ public class ArmorBarRenderer {
         ArmorItem armorItem = (ArmorItem) itemStack.getItem();
         Multimap<EntityAttribute, EntityAttributeModifier> attributes = itemStack.getAttributeModifiers(armorItem.getSlotType());
         if (attributes.containsKey(EntityAttributes.GENERIC_ARMOR)) {
-            return attributes.get(EntityAttributes.GENERIC_ARMOR).stream().mapToInt(att -> (int) att.getValue()).sum();
+            return attributes.get(EntityAttributes.GENERIC_ARMOR).stream()
+                    .filter(att -> Arrays.stream(MODIFIERS).toList().contains(att.getId())).mapToInt(att -> (int) att.getValue()).sum();
         } else {
             return armorItem.getProtection();
         }
