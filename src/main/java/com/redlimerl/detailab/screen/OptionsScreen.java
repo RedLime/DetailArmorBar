@@ -8,7 +8,10 @@ import net.minecraft.util.IReorderingProcessor;
 import net.minecraft.util.text.*;
 
 import javax.annotation.Nonnull;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.Locale;
 
 import static com.redlimerl.detailab.DetailArmorBar.getConfig;
 
