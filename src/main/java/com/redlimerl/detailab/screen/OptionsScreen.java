@@ -195,7 +195,7 @@ public class OptionsScreen extends Screen {
     }
 
     @Override
-    public void onClose() {
+    public void close() {
         if (client != null) {
             client.setScreen(parent);
         }
