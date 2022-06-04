@@ -2,6 +2,7 @@ package com.redlimerl.detailab.api.render;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.redlimerl.detailab.ClientInitializer;
 import com.redlimerl.detailab.DetailArmorBar;
 import com.redlimerl.detailab.render.InGameDrawer;
 import net.minecraft.world.item.ItemStack;
@@ -11,17 +12,17 @@ import java.util.function.Function;
 
 public class CustomArmorBar {
 
-    public static CustomArmorBar DEFAULT = new CustomArmorBar(itemStack -> new ArmorBarRenderManager(DetailArmorBar.GUI_ARMOR_BAR, 128, 128,
+    public static CustomArmorBar DEFAULT = new CustomArmorBar(itemStack -> new ArmorBarRenderManager(ClientInitializer.GUI_ARMOR_BAR, 128, 128,
             new TextureOffset(63, 9 + DetailArmorBar.isVanillaTexture()), new TextureOffset(54, 9 + DetailArmorBar.isVanillaTexture()),
             new TextureOffset(9, 0), new TextureOffset(27, 0)));
 
     public static CustomArmorBar EMPTY = new CustomArmorBar(itemStack -> {
         if (DetailArmorBar.getConfig().getOptions().toggleEmptyBar) {
-            return new ArmorBarRenderManager(DetailArmorBar.GUI_ARMOR_BAR, 128, 128,
+            return new ArmorBarRenderManager(ClientInitializer.GUI_ARMOR_BAR, 128, 128,
                     new TextureOffset(45, 0), new TextureOffset(45, 0), new TextureOffset(9, 0), new TextureOffset(27, 0));
         } else {
             return new ArmorBarRenderManager(
-                    DetailArmorBar.GUI_ARMOR_BAR, 128, 128,
+                    ClientInitializer.GUI_ARMOR_BAR, 128, 128,
                     new TextureOffset(0, 0), new TextureOffset(0, 0), new TextureOffset(0, 0), new TextureOffset(0, 0));
         }
     });

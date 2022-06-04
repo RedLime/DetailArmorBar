@@ -26,9 +26,8 @@ import net.minecraft.world.item.enchantment.Enchantments;
 import java.awt.*;
 import java.util.List;
 import java.util.*;
-import java.util.stream.Collectors;
 
-import static com.redlimerl.detailab.DetailArmorBar.GUI_ARMOR_BAR;
+import static com.redlimerl.detailab.ClientInitializer.GUI_ARMOR_BAR;
 import static com.redlimerl.detailab.DetailArmorBar.getConfig;
 import static com.redlimerl.detailab.config.ConfigEnumType.Animation;
 import static com.redlimerl.detailab.config.ConfigEnumType.ProtectionEffect;
