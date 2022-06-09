@@ -1,13 +1,11 @@
 package com.redlimerl.detailab.screen;
 
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.ScreenTexts;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.LiteralText;
+import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Formatting;
 
 import java.util.ArrayList;
@@ -30,7 +28,7 @@ public class OptionsScreen extends Screen {
     }
 
     public OptionsScreen(Screen parent, OptionType optionType) {
-        super(new TranslatableText("options.title"));
+        super(Text.translatable("options.title"));
         this.parent = parent;
         this.optionType = optionType;
     }
@@ -156,7 +154,7 @@ public class OptionsScreen extends Screen {
         }
 
         ButtonWidget features = addDrawableChild(new ButtonWidget(width / 2 - 92, height / 6 + 140, 60, 20,
-                new TranslatableText("option.detailarmorbar.title.features"), (matrixStack) -> {
+                Text.translatable("option.detailarmorbar.title.features"), (matrixStack) -> {
             if (client != null) {
                 client.setScreen(new OptionsScreen(parent, OptionType.FEATURES));
             }
@@ -164,7 +162,7 @@ public class OptionsScreen extends Screen {
         features.active = optionType != OptionType.FEATURES;
 
         ButtonWidget animation = addDrawableChild(new ButtonWidget(width / 2 - 30, height / 6 + 140, 60, 20,
-                new TranslatableText("option.detailarmorbar.title.animation"), (matrixStack) -> {
+                Text.translatable("option.detailarmorbar.title.animation"), (matrixStack) -> {
             if (client != null) {
                 client.setScreen(new OptionsScreen(parent, OptionType.ANIMATION));
             }
@@ -172,7 +170,7 @@ public class OptionsScreen extends Screen {
         animation.active = optionType != OptionType.ANIMATION;
 
         ButtonWidget etc = addDrawableChild(new ButtonWidget(width / 2 + 32, height / 6 + 140, 60, 20,
-                new TranslatableText("option.detailarmorbar.title.etc"), (matrixStack) -> {
+                Text.translatable("option.detailarmorbar.title.etc"), (matrixStack) -> {
             if (client != null) {
                 client.setScreen(new OptionsScreen(parent, OptionType.ETC));
             }
@@ -207,38 +205,38 @@ public class OptionsScreen extends Screen {
     }
 
     private <T extends Enum<T>> MutableText getEnumName(String type, T target) {
-        return new TranslatableText("option.detailarmorbar.effects."+type)
+        return Text.translatable("option.detailarmorbar.effects."+type)
                 .append(": ")
-                .append(new TranslatableText("option.detailarmorbar.effects."+type+"."+target.name().toLowerCase(Locale.ROOT)));
+                .append(Text.translatable("option.detailarmorbar.effects."+type+"."+target.name().toLowerCase(Locale.ROOT)));
     }
 
     private <T extends Enum<T>> List<Text> getEnumDescription(String type, T target) {
         ArrayList<Text> list = new ArrayList<>();
-        for (String s : new TranslatableText("context.detailarmorbar.effects." + type).getString().split("/"))
-            list.add(new LiteralText(s).formatted(Formatting.YELLOW));
+        for (String s : Text.translatable("context.detailarmorbar.effects." + type).getString().split("/"))
+            list.add(Text.literal(s).formatted(Formatting.YELLOW));
 
-        list.add(LiteralText.EMPTY);
+        list.add(Text.empty());
 
         List<T> v = EnumSet.allOf(target.getDeclaringClass()).stream().toList();
         for (T t : v) {
-            list.add(new LiteralText(" ")
-                    .append(new TranslatableText("option.detailarmorbar.effects."+type+"."+t.name().toLowerCase(Locale.ROOT)).formatted(Formatting.ITALIC))
+            list.add(Text.literal(" ")
+                    .append(Text.translatable("option.detailarmorbar.effects."+type+"."+t.name().toLowerCase(Locale.ROOT)).formatted(Formatting.ITALIC))
                     .append(" - ")
-                    .append(new TranslatableText("context.detailarmorbar.effects."+type+"."+t.name().toLowerCase(Locale.ROOT))));
+                    .append(Text.translatable("context.detailarmorbar.effects."+type+"."+t.name().toLowerCase(Locale.ROOT))));
         }
         return list;
     }
 
     private MutableText getToggleName(String type, boolean target) {
-        return new TranslatableText("option.detailarmorbar.toggle."+type)
+        return Text.translatable("option.detailarmorbar.toggle."+type)
                 .append(": ")
                 .append(target ? ScreenTexts.ON : ScreenTexts.OFF);
     }
 
     private List<Text> getToggleDescription(String type) {
         ArrayList<Text> list = new ArrayList<>();
-        for (String s : new TranslatableText("context.detailarmorbar.toggle." + type).getString().split("/"))
-            list.add(new LiteralText(s).formatted(Formatting.YELLOW));
+        for (String s : Text.translatable("context.detailarmorbar.toggle." + type).getString().split("/"))
+            list.add(Text.literal(s).formatted(Formatting.YELLOW));
         return list;
     }
 
