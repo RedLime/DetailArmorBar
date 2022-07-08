@@ -15,7 +15,8 @@ displayURL="https://github.com/RedLime/DetailArmorBar/tree/1.18-forge"
 [[dependencies.detailab]]
     modId="forge"
     mandatory=true
-    versionRange="[41,)"
+    # setting the minimum comaptible Forge version to 41.0.64 due to the rendering refactor
+    versionRange="[41.0.64,)"
     ordering="NONE"
     side="CLIENT"
 [[dependencies.detailab]]
