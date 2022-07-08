@@ -26,7 +26,7 @@ public class PlayerEvents {
             event.setCanceled(true);
             var instance = Minecraft.getInstance();
             if (instance.player != null && instance.gameMode != null && instance.gameMode.getPlayerMode().isSurvival()) {
-                ArmorBarRenderer.INSTANCE.render(event.getMatrixStack(), instance.player);
+                ArmorBarRenderer.INSTANCE.render(event.getPoseStack(), instance.player);
             }
         }
     }

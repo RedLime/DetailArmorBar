@@ -24,7 +24,7 @@ public class OptionsScreen extends Screen {
     }
 
     public OptionsScreen(Screen parent, OptionType optionType) {
-        super(new TranslatableComponent("options.title"));
+        super(Component.translatable("options.title"));
         this.parent = parent;
         this.optionType = optionType;
     }
@@ -150,7 +150,7 @@ public class OptionsScreen extends Screen {
         }
 
         Button features = addRenderableWidget(new Button(width / 2 - 92, height / 6 + 140, 60, 20,
-                new TranslatableComponent("option.detailarmorbar.title.features"), (matrixStack) -> {
+                Component.translatable("option.detailarmorbar.title.features"), (matrixStack) -> {
             if (this.minecraft != null) {
                 this.minecraft.setScreen(new OptionsScreen(parent, OptionType.FEATURES));
             }
@@ -158,7 +158,7 @@ public class OptionsScreen extends Screen {
         features.active = optionType != OptionType.FEATURES;
 
         Button animation = addRenderableWidget(new Button(width / 2 - 30, height / 6 + 140, 60, 20,
-                new TranslatableComponent("option.detailarmorbar.title.animation"), (matrixStack) -> {
+                Component.translatable("option.detailarmorbar.title.animation"), (matrixStack) -> {
             if (this.minecraft != null) {
                 this.minecraft.setScreen(new OptionsScreen(parent, OptionType.ANIMATION));
             }
@@ -166,7 +166,7 @@ public class OptionsScreen extends Screen {
         animation.active = optionType != OptionType.ANIMATION;
 
         Button etc = addRenderableWidget(new Button(width / 2 + 32, height / 6 + 140, 60, 20,
-                new TranslatableComponent("option.detailarmorbar.title.etc"), (matrixStack) -> {
+                Component.translatable("option.detailarmorbar.title.etc"), (matrixStack) -> {
             if (this.minecraft != null) {
                 this.minecraft.setScreen(new OptionsScreen(parent, OptionType.ETC));
             }
@@ -201,38 +201,38 @@ public class OptionsScreen extends Screen {
     }
 
     private <T extends Enum<T>> MutableComponent getEnumName(String type, T target) {
-        return new TranslatableComponent("option.detailarmorbar.effects."+type)
+        return Component.translatable("option.detailarmorbar.effects."+type)
                 .append(": ")
-                .append(new TranslatableComponent("option.detailarmorbar.effects."+type+"."+target.name().toLowerCase(Locale.ROOT)));
+                .append(Component.translatable("option.detailarmorbar.effects."+type+"."+target.name().toLowerCase(Locale.ROOT)));
     }
 
     private <T extends Enum<T>> List<Component> getEnumDescription(String type, T target) {
         ArrayList<Component> list = new ArrayList<>();
-        for (String s : new TranslatableComponent("context.detailarmorbar.effects." + type).getString().split("/"))
-            list.add(new TextComponent(s).withStyle(ChatFormatting.YELLOW));
+        for (String s : Component.translatable("context.detailarmorbar.effects." + type).getString().split("/"))
+            list.add(Component.translatable(s).withStyle(ChatFormatting.YELLOW));
 
-        list.add(TextComponent.EMPTY);
+        list.add(Component.empty());
 
         List<T> v = EnumSet.allOf(target.getDeclaringClass()).stream().toList();
         for (T t : v) {
-            list.add(new TextComponent(" ")
-                    .append(new TranslatableComponent("option.detailarmorbar.effects."+type+"."+t.name().toLowerCase(Locale.ROOT)).withStyle(ChatFormatting.ITALIC))
+            list.add(Component.literal(" ")
+                    .append(Component.translatable("option.detailarmorbar.effects."+type+"."+t.name().toLowerCase(Locale.ROOT)).withStyle(ChatFormatting.ITALIC))
                     .append(" - ")
-                    .append(new TranslatableComponent("context.detailarmorbar.effects."+type+"."+t.name().toLowerCase(Locale.ROOT))));
+                    .append(Component.translatable("context.detailarmorbar.effects."+type+"."+t.name().toLowerCase(Locale.ROOT))));
         }
         return list;
     }
 
     private MutableComponent getToggleName(String type, boolean target) {
-        return new TranslatableComponent("option.detailarmorbar.toggle."+type)
+        return Component.translatable("option.detailarmorbar.toggle."+type)
                 .append(": ")
                 .append(target ? CommonComponents.OPTION_ON : CommonComponents.OPTION_OFF);
     }
 
     private  List<Component> getToggleDescription(String type) {
         ArrayList<Component> list = new ArrayList<>();
-        for (String s : new TranslatableComponent("context.detailarmorbar.toggle." + type).getString().split("/"))
-            list.add(new TextComponent(s).withStyle(ChatFormatting.YELLOW));
+        for (String s : Component.translatable("context.detailarmorbar.toggle." + type).getString().split("/"))
+            list.add(Component.translatable(s).withStyle(ChatFormatting.YELLOW));
         return list;
     }
 }
