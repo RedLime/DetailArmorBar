@@ -47,7 +47,6 @@ public class InGameDrawer {
             bufferBuilder.vertex(matrices, (float)x1, (float)y0, (float)z).uv(u1, v0).endVertex();
             bufferBuilder.vertex(matrices, (float)x0, (float)y0, (float)z).uv(u0, v0).endVertex();
         }
-        bufferBuilder.end();
-        BufferUploader.end(bufferBuilder);
+        BufferUploader.drawWithShader(bufferBuilder.end());
     }
 }

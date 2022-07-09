@@ -8,8 +8,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.RenderGameOverlayEvent;
-import net.minecraftforge.client.gui.ForgeIngameGui;
+import net.minecraftforge.client.event.RenderGuiOverlayEvent;
+import net.minecraftforge.client.gui.overlay.VanillaGuiOverlay;
 import net.minecraftforge.event.entity.player.PlayerXpEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -21,12 +21,12 @@ import java.util.Map;
 public class PlayerEvents {
 
     @SubscribeEvent
-    public static void onArmorRender(RenderGameOverlayEvent.PreLayer event) {
-        if (event.getOverlay() == ForgeIngameGui.ARMOR_LEVEL_ELEMENT) {
+    public static void onArmorRender(RenderGuiOverlayEvent.Pre event) {
+        if (event.getOverlay().id() == VanillaGuiOverlay.ARMOR_LEVEL.id()) {
             event.setCanceled(true);
             var instance = Minecraft.getInstance();
             if (instance.player != null && instance.gameMode != null && instance.gameMode.getPlayerMode().isSurvival()) {
-                ArmorBarRenderer.INSTANCE.render(event.getMatrixStack(), instance.player);
+                ArmorBarRenderer.INSTANCE.render(event.getPoseStack(), instance.player);
             }
         }
     }

@@ -1,6 +1,7 @@
 modLoader="javafml" #mandatory
-loaderVersion="[37,)"
+loaderVersion="[41,)"
 license="MIT Licence"
+
 [[mods]]
 modId="detailab"
 version="${file.jarVersion}"
@@ -10,15 +11,17 @@ authors="RedLime"
 credits="snessim, Heamaci"
 description='''Show more details of armors in Armor bar!'''
 displayURL="https://github.com/RedLime/DetailArmorBar/tree/1.18-forge"
+
 [[dependencies.detailab]]
     modId="forge"
     mandatory=true
-    versionRange="[37,)"
+    # setting the minimum comaptible Forge version to 41.0.64 due to the rendering refactor
+    versionRange="[41.0.64,)"
     ordering="NONE"
     side="CLIENT"
 [[dependencies.detailab]]
     modId="minecraft"
     mandatory=true
-    versionRange="[1.18.2]"
+    versionRange="[1.19]"
     ordering="NONE"
     side="CLIENT"
