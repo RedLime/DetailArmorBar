@@ -33,7 +33,7 @@ public class PlayerEvents {
 
     @SubscribeEvent
     public static void onExpPick(PlayerXpEvent.PickupXp event) {
-        Map.Entry<EquipmentSlot, ItemStack> entry = EnchantmentHelper.getRandomItemWith(Enchantments.MENDING, event.getPlayer(), ItemStack::isDamaged);
+        Map.Entry<EquipmentSlot, ItemStack> entry = EnchantmentHelper.getRandomItemWith(Enchantments.MENDING, event.getEntity(), ItemStack::isDamaged);
         if (entry != null) ArmorBarRenderer.LAST_MENDING = DetailArmorBar.getTicks();
     }
 }
