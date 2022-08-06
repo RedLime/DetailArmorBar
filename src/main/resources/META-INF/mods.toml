@@ -16,12 +16,12 @@ displayURL="https://github.com/RedLime/DetailArmorBar/tree/1.19-forge"
     modId="forge"
     mandatory=true
     # setting the minimum comaptible Forge version to 41.0.94 due to incompatibility with previous versions
-    versionRange="[41.0.94,)"
+    versionRange="[43.0.0,)"
     ordering="NONE"
     side="CLIENT"
 [[dependencies.detailab]]
     modId="minecraft"
     mandatory=true
-    versionRange="[1.19]"
+    versionRange="[1.19.2]"
     ordering="NONE"
     side="CLIENT"
