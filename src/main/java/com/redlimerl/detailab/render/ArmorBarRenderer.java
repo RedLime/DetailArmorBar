@@ -1,10 +1,26 @@
 package com.redlimerl.detailab.render;
 
+import static com.redlimerl.detailab.DetailArmorBar.GUI_ARMOR_BAR;
+import static com.redlimerl.detailab.DetailArmorBar.getConfig;
+
+import java.awt.Color;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Stack;
+import java.util.UUID;
+
 import com.google.common.collect.Multimap;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.redlimerl.detailab.DetailArmorBar;
 import com.redlimerl.detailab.api.DetailArmorBarAPI;
 import com.redlimerl.detailab.api.render.CustomArmorBar;
+import com.redlimerl.detailab.config.ConfigEnumType.Animation;
+import com.redlimerl.detailab.config.ConfigEnumType.ProtectionEffect;
+import com.redlimerl.detailab.mixins.EntityAttributeInstanceInvoker;
+
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.hud.InGameHud;
@@ -23,14 +39,6 @@ import net.minecraft.item.ArmorMaterials;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Pair;
 import net.minecraft.util.math.MathHelper;
-
-import java.awt.*;
-import java.util.List;
-import java.util.*;
-
-import static com.redlimerl.detailab.DetailArmorBar.*;
-import static com.redlimerl.detailab.config.ConfigEnumType.Animation;
-import static com.redlimerl.detailab.config.ConfigEnumType.ProtectionEffect;
 
 public class ArmorBarRenderer {
     static class LevelData {
@@ -150,17 +158,24 @@ public class ArmorBarRenderer {
 
         EntityAttributeInstance attribute = player.getAttributeInstance(EntityAttributes.GENERIC_ARMOR);
         if (attribute != null) {
-            for (int i = 0; i < attribute.getBaseValue(); i++) {
-                armorItem.add(new Pair<>(ItemStack.EMPTY, CustomArmorBar.DEFAULT));
-            }
-
-            for (EntityAttributeModifier entityAttributeModifier : attribute.getModifiers()) {
-                if (!Arrays.stream(MODIFIERS).toList().contains(entityAttributeModifier.getId())) {
-                    for (int i = 0; i < entityAttributeModifier.getValue(); i++) {
-                        armorItem.add(new Pair<>(ItemStack.EMPTY, CustomArmorBar.DEFAULT));
-                    }
-                }
-            }
+        	double d = attribute.getBaseValue();
+        	for (int i = 0; i < d; i++) {
+        		armorItem.add(new Pair<>(ItemStack.EMPTY, CustomArmorBar.DEFAULT));
+        	}
+        	
+        	for (EntityAttributeModifier modifier : ((EntityAttributeInstanceInvoker)attribute).invokeGetModifiersByOperation(EntityAttributeModifier.Operation.ADDITION)) {
+        		d += modifier.getValue();
+        		
+        		if (!Arrays.stream(MODIFIERS).toList().contains(modifier.getId())) {
+        			for (int i = 0; i < modifier.getValue(); i++) {
+                		armorItem.add(new Pair<>(ItemStack.EMPTY, CustomArmorBar.DEFAULT));
+                	}
+        		}
+        	}
+        	
+        	for (int i = 0; i < attribute.getValue() - d; i++) {
+        		armorItem.add(new Pair<>(ItemStack.EMPTY, CustomArmorBar.DEFAULT));
+        	}
         }
 
         for (ItemStack itemStack : equipment) {
