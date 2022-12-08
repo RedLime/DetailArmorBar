@@ -261,7 +261,7 @@ public class ArmorBarRenderer {
         int stackRow = stackCount * 20;
 
         RenderSystem.enableBlend();
-        RenderSystem.setShader(GameRenderer::getPositionTexShader);
+        RenderSystem.setShader(GameRenderer::getPositionTexProgram);
 
         //Default
         if (totalArmorPoint > 0) {

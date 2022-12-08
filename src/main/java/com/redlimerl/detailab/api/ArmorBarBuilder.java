@@ -5,7 +5,7 @@ import com.redlimerl.detailab.api.render.ArmorBarRenderManager;
 import com.redlimerl.detailab.api.render.CustomArmorBar;
 import net.minecraft.item.ArmorItem;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.registry.Registry;
+import net.minecraft.registry.Registries;
 import org.apache.logging.log4j.Level;
 
 import java.util.function.Function;
@@ -47,7 +47,7 @@ public class ArmorBarBuilder {
                 DetailArmorBarAPI.armorList.put(armorItem, armorBar);
             }
             if (armor.length != 0) {
-                DetailArmorBar.LOGGER.log(Level.INFO, "Successfully registered '"+ Registry.ITEM.getId(armor[0]) + (armor.length > 1 ? "' and "+(armor.length-1)+" more items" : "'") + "!");
+                DetailArmorBar.LOGGER.log(Level.INFO, "Successfully registered '"+ Registries.ITEM.getId(armor[0]) + (armor.length > 1 ? "' and "+(armor.length-1)+" more items" : "'") + "!");
             }
         } catch (Exception e) {
             throw new IllegalStateException("Not all items have been initialized");
