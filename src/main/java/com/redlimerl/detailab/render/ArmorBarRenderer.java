@@ -22,10 +22,9 @@ import com.redlimerl.detailab.config.ConfigEnumType.ProtectionEffect;
 import com.redlimerl.detailab.mixins.EntityAttributeInstanceInvoker;
 
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawableHelper;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.client.render.GameRenderer;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
@@ -37,6 +36,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ArmorItem;
 import net.minecraft.item.ArmorMaterials;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.Pair;
 import net.minecraft.util.math.MathHelper;
 
@@ -51,6 +51,7 @@ public class ArmorBarRenderer {
     }
 
     public static final ArmorBarRenderer INSTANCE = new ArmorBarRenderer();
+    private static final Identifier ICONS = new Identifier("textures/gui/icons.png");
     public static long LAST_THORNS = 0L;
     public static long LAST_MENDING = 0L;
     private static final UUID[] MODIFIERS = new UUID[]{UUID.fromString("845DB27C-C624-495F-8C9F-6020A9A58B6B"), UUID.fromString("D8499B04-0E66-4726-AB29-64469D734E0D"), UUID.fromString("9F3D476D-C118-4544-8365-64846904B48E"), UUID.fromString("2AD3F246-FEE1-4E67-B886-69FD380BB150")};
@@ -236,7 +237,7 @@ public class ArmorBarRenderer {
     private final MinecraftClient client = MinecraftClient.getInstance();
     private final InGameHud hud = client.inGameHud;
 
-    public void render(MatrixStack matrices, PlayerEntity player) {
+    public void render(DrawContext context, PlayerEntity player) {
         client.getProfiler().swap("armor");
 
         var generic = getEnchantLevel(player.getArmorItems(), Enchantments.PROTECTION);
@@ -273,25 +274,25 @@ public class ArmorBarRenderer {
                     Pair<ItemStack, CustomArmorBar> am1 = armorPoints.get(count * 2 + stackRow);
                     Pair<ItemStack, CustomArmorBar> am2 = armorPoints.get(count * 2 + 1 + stackRow);
                     if (am1.getRight() == am2.getRight()) {
-                        am1.getRight().draw(am1.getLeft(), matrices, xPos, yPos, false, false);
+                        am1.getRight().draw(am1.getLeft(), context, xPos, yPos, false, false);
                     } else {
-                        am2.getRight().draw(am2.getLeft(), matrices, xPos, yPos, true, true);
-                        am1.getRight().draw(am1.getLeft(), matrices, xPos, yPos, true, false);
+                        am2.getRight().draw(am2.getLeft(), context, xPos, yPos, true, true);
+                        am1.getRight().draw(am1.getLeft(), context, xPos, yPos, true, false);
                     }
                 }
                 if (count * 2 + 1 + stackRow == totalArmorPoint) {
-                    CustomArmorBar.EMPTY.draw(ItemStack.EMPTY, matrices, xPos, yPos, false, false);
+                    CustomArmorBar.EMPTY.draw(ItemStack.EMPTY, context, xPos, yPos, false, false);
                     Pair<ItemStack, CustomArmorBar> am = armorPoints.get(count * 2 + stackRow);
-                    am.getRight().draw(am.getLeft(), matrices, xPos, yPos, true, false);
+                    am.getRight().draw(am.getLeft(), context, xPos, yPos, true, false);
                 }
                 if (count * 2 + 1 + stackRow > totalArmorPoint) {
-                    CustomArmorBar.EMPTY.draw(ItemStack.EMPTY, matrices, xPos, yPos, false, false);
+                    CustomArmorBar.EMPTY.draw(ItemStack.EMPTY, context, xPos, yPos, false, false);
                 }
             }
 
             if (armorPoints.size() > 20) {
                 for (int i = 0; i < stackCount; i++) {
-                    CustomArmorBar.DEFAULT.draw(ItemStack.EMPTY, matrices, screenWidth - 7 - ((stackCount - i)*3), yPos, false, false);
+                    CustomArmorBar.DEFAULT.draw(ItemStack.EMPTY, context, screenWidth - 7 - ((stackCount - i)*3), yPos, false, false);
                 }
             }
         }
@@ -312,15 +313,15 @@ public class ArmorBarRenderer {
                         Pair<ItemStack, CustomArmorBar> am = armorPoints.get((halfArmors - count) * 2 + stackRow);
                         if (armorPreset == (halfArmors - count) * 2 + 1) {
                             if (count == 0) {
-                                am.getRight().drawOutLine(am.getLeft(), matrices, xPos, yPos, true, false, lowDurColor);
+                                am.getRight().drawOutLine(am.getLeft(), context, xPos, yPos, true, false, lowDurColor);
                                 lowDur--;
                             }
                         } else {
                             if (lowDur == 1) {
-                                am.getRight().drawOutLine(am.getLeft(), matrices, xPos, yPos, true, true, lowDurColor);
+                                am.getRight().drawOutLine(am.getLeft(), context, xPos, yPos, true, true, lowDurColor);
                                 lowDur = 0;
                             } else {
-                                am.getRight().drawOutLine(am.getLeft(), matrices, xPos, yPos, false, false, lowDurColor);
+                                am.getRight().drawOutLine(am.getLeft(), context, xPos, yPos, false, false, lowDurColor);
                                 lowDur -= 2;
                             }
                         }
@@ -341,10 +342,10 @@ public class ArmorBarRenderer {
 
                         if (armorPoints.size() <= count * 2 + stackRow) {
                             if (getConfig().getOptions().toggleEmptyBar)
-                                CustomArmorBar.DEFAULT.drawOutLine(ItemStack.EMPTY, matrices, xPos, yPos, false, false, Color.WHITE);
+                                CustomArmorBar.DEFAULT.drawOutLine(ItemStack.EMPTY, context, xPos, yPos, false, false, Color.WHITE);
                         } else {
                             Pair<ItemStack, CustomArmorBar> am = armorPoints.get(count * 2 + stackRow);
-                            am.getRight().drawOutLine(am.getLeft(), matrices, xPos, yPos, false, false, Color.WHITE);
+                            am.getRight().drawOutLine(am.getLeft(), context, xPos, yPos, false, false, Color.WHITE);
                         }
                     }
                 }
@@ -371,17 +372,17 @@ public class ArmorBarRenderer {
                         } else if (min != -1 && max == -1 && protectArr[pw] >= 1) max = pw;
                     }
                     if (min != -1 && max != -1) {
-                        drawEnchantTexture(matrices, xPos, yPos, getProtectColor(protectArr), 2);
+                        drawEnchantTexture(context, xPos, yPos, getProtectColor(protectArr), 2);
                         protectArr[min] = 0;
-                        drawEnchantTexture(matrices, xPos, yPos, getProtectColor(protectArr), 1);
+                        drawEnchantTexture(context, xPos, yPos, getProtectColor(protectArr), 1);
                         protectArr[max] -= 1;
                     } else {
-                        drawEnchantTexture(matrices, xPos, yPos, getProtectColor(protectArr), 0);
+                        drawEnchantTexture(context, xPos, yPos, getProtectColor(protectArr), 0);
                         protectArr[min] -= 2;
                     }
                 }
                 if (count * 2 + 1 == totalEnchants) {
-                    drawEnchantTexture(matrices, xPos, yPos, getProtectColor(protectArr), 2);
+                    drawEnchantTexture(context, xPos, yPos, getProtectColor(protectArr), 2);
                 }
             }
         }
@@ -394,20 +395,20 @@ public class ArmorBarRenderer {
 
                 int xPos = screenWidth + count * 8;
                 if (count * 2 + 1 < thorns.level) {
-                    InGameDrawer.drawTexture(matrices, xPos, yPos, 36, 18, thornsColor, false);
+                    InGameDrawer.drawTexture(context, xPos, yPos, 36, 18, thornsColor, false);
                 }
                 if (count * 2 + 1 == thorns.level) {
-                    InGameDrawer.drawTexture(matrices, xPos, yPos, 27, 18, thornsColor, false);
+                    InGameDrawer.drawTexture(context, xPos, yPos, 27, 18, thornsColor, false);
                 }
             }
         }
 
         RenderSystem.disableBlend();
         RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
-        RenderSystem.setShaderTexture(0, DrawableHelper.GUI_ICONS_TEXTURE);
+        RenderSystem.setShaderTexture(0, ICONS);
     }
 
-    private void drawEnchantTexture(MatrixStack matrices, int x, int y, Color color, int half) {
+    private void drawEnchantTexture(DrawContext context, int x, int y, Color color, int half) {
         int u = 0;
         int v = 0;
         var t = (hud.getTicks()/3) % 36;
@@ -421,6 +422,6 @@ public class ArmorBarRenderer {
             u = 9 + (half * 9);
         } else return;
 
-        InGameDrawer.drawTexture(matrices, x, y, u, v, color, false);
+        InGameDrawer.drawTexture(context, x, y, u, v, color, false);
     }
 }
