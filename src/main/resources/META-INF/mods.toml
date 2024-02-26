@@ -1,5 +1,5 @@
 modLoader="javafml" #mandatory
-loaderVersion="[41,)"
+loaderVersion="[47,)"
 license="MIT Licence"
 
 [[mods]]
@@ -16,12 +16,12 @@ displayURL="https://github.com/RedLime/DetailArmorBar/tree/1.19-forge"
     modId="forge"
     mandatory=true
     # setting the minimum comaptible Forge version to 41.0.94 due to incompatibility with previous versions
-    versionRange="[43.0.0,)"
+    versionRange="[47.0.0,)"
     ordering="NONE"
     side="CLIENT"
 [[dependencies.detailab]]
     modId="minecraft"
     mandatory=true
-    versionRange="[1.19.2]"
+    versionRange="[1.20.1]"
     ordering="NONE"
     side="CLIENT"

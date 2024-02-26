@@ -9,7 +9,6 @@ import com.redlimerl.detailab.api.DetailArmorBarAPI;
 import com.redlimerl.detailab.api.render.CustomArmorBar;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
-import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
@@ -213,7 +212,7 @@ public class ArmorBarRenderer {
 
     private static int getDefense(ItemStack itemStack) {
         ArmorItem armorItem = (ArmorItem) itemStack.getItem();
-        Multimap<Attribute, AttributeModifier> attributes = itemStack.getAttributeModifiers(armorItem.getSlot());
+        Multimap<Attribute, AttributeModifier> attributes = itemStack.getAttributeModifiers(armorItem.getEquipmentSlot());
         if (attributes.containsKey(Attributes.ARMOR)) {
             return attributes.get(Attributes.ARMOR).stream()
                     .filter(att -> Arrays.stream(MODIFIERS).toList().contains(att.getId())).mapToInt(att -> (int) att.getAmount()).sum();
@@ -396,7 +395,7 @@ public class ArmorBarRenderer {
 
         RenderSystem.disableBlend();
         RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
-        RenderSystem.setShaderTexture(0, GuiComponent.GUI_ICONS_LOCATION);
+        RenderSystem.setShaderTexture(0, Gui.GUI_ICONS_LOCATION);
     }
 
     private void drawEnchantTexture(PoseStack matrices, int x, int y, Color color, int half) {
