@@ -1,44 +1,35 @@
 package com.redlimerl.detailab.render;
 
-import static com.redlimerl.detailab.DetailArmorBar.GUI_ARMOR_BAR;
-import static com.redlimerl.detailab.DetailArmorBar.getConfig;
-
-import java.awt.Color;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Stack;
-import java.util.UUID;
-
-import com.google.common.collect.Multimap;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.redlimerl.detailab.DetailArmorBar;
 import com.redlimerl.detailab.api.DetailArmorBarAPI;
 import com.redlimerl.detailab.api.render.CustomArmorBar;
 import com.redlimerl.detailab.config.ConfigEnumType.Animation;
 import com.redlimerl.detailab.config.ConfigEnumType.ProtectionEffect;
-import com.redlimerl.detailab.mixins.EntityAttributeInstanceInvoker;
-
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.client.render.GameRenderer;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.AttributeModifiersComponent;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
-import net.minecraft.entity.attribute.EntityAttribute;
 import net.minecraft.entity.attribute.EntityAttributeInstance;
-import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ArmorItem;
 import net.minecraft.item.ArmorMaterials;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.Pair;
 import net.minecraft.util.math.MathHelper;
+
+import java.awt.*;
+import java.util.List;
+import java.util.*;
+
+import static com.redlimerl.detailab.DetailArmorBar.GUI_ARMOR_BAR;
+import static com.redlimerl.detailab.DetailArmorBar.getConfig;
 
 public class ArmorBarRenderer {
     static class LevelData {
@@ -51,10 +42,8 @@ public class ArmorBarRenderer {
     }
 
     public static final ArmorBarRenderer INSTANCE = new ArmorBarRenderer();
-    private static final Identifier ICONS = new Identifier("textures/gui/icons.png");
     public static long LAST_THORNS = 0L;
     public static long LAST_MENDING = 0L;
-    private static final UUID[] MODIFIERS = new UUID[]{UUID.fromString("845DB27C-C624-495F-8C9F-6020A9A58B6B"), UUID.fromString("D8499B04-0E66-4726-AB29-64469D734E0D"), UUID.fromString("9F3D476D-C118-4544-8365-64846904B48E"), UUID.fromString("2AD3F246-FEE1-4E67-B886-69FD380BB150")};
 
 
     private static int getAnimationSpeed() {
@@ -117,12 +106,12 @@ public class ArmorBarRenderer {
 
         for (ItemStack itemStack : equipment) {
             if (!itemStack.isEmpty()) {
-                EnchantmentHelper.get(itemStack).forEach((enchantment, integer) -> {
-                    LevelData enchantData = result.getOrDefault(enchantment, new LevelData(0, 0));
+                EnchantmentHelper.getEnchantments(itemStack).getEnchantmentsMap().forEach(enchantment -> {
+                    LevelData enchantData = result.getOrDefault(enchantment.getKey().value(), new LevelData(0, 0));
                     enchantData.count++;
-                    enchantData.level += integer;
-                    if (enchantment == Enchantments.THORNS) enchantData.level += integer - 1;
-                    result.put(enchantment, enchantData);
+                    enchantData.level += enchantment.getIntValue();
+                    if (enchantment.getKey().value() == Enchantments.THORNS) enchantData.level += enchantment.getIntValue() - 1;
+                    result.put(enchantment.getKey().value(), enchantData);
                 });
             }
         }
@@ -161,20 +150,6 @@ public class ArmorBarRenderer {
         if (attribute != null) {
         	double d = attribute.getBaseValue();
         	for (int i = 0; i < d; i++) {
-        		armorItem.add(new Pair<>(ItemStack.EMPTY, CustomArmorBar.DEFAULT));
-        	}
-        	
-        	for (EntityAttributeModifier modifier : ((EntityAttributeInstanceInvoker)attribute).invokeGetModifiersByOperation(EntityAttributeModifier.Operation.ADDITION)) {
-        		d += modifier.getValue();
-        		
-        		if (!Arrays.stream(MODIFIERS).toList().contains(modifier.getId())) {
-        			for (int i = 0; i < modifier.getValue(); i++) {
-                		armorItem.add(new Pair<>(ItemStack.EMPTY, CustomArmorBar.DEFAULT));
-                	}
-        		}
-        	}
-        	
-        	for (int i = 0; i < attribute.getValue() - d; i++) {
         		armorItem.add(new Pair<>(ItemStack.EMPTY, CustomArmorBar.DEFAULT));
         	}
         }
@@ -223,13 +198,13 @@ public class ArmorBarRenderer {
 
     private static int getDefense(ItemStack itemStack) {
         ArmorItem armorItem = (ArmorItem) itemStack.getItem();
-        Multimap<EntityAttribute, EntityAttributeModifier> attributes = itemStack.getAttributeModifiers(armorItem.getSlotType());
-        if (attributes.containsKey(EntityAttributes.GENERIC_ARMOR)) {
-            return attributes.get(EntityAttributes.GENERIC_ARMOR).stream()
-                    .filter(att -> Arrays.stream(MODIFIERS).toList().contains(att.getId())).mapToInt(att -> (int) att.getValue()).sum();
-        } else {
-            return armorItem.getProtection();
+        AttributeModifiersComponent modifier = itemStack.getOrDefault(DataComponentTypes.ATTRIBUTE_MODIFIERS, AttributeModifiersComponent.DEFAULT);
+        for (AttributeModifiersComponent.Entry entry : modifier.modifiers()) {
+            if (entry.slot().matches(armorItem.getSlotType()) && entry.attribute().equals(EntityAttributes.GENERIC_ARMOR)) {
+                return (int) entry.modifier().value();
+            }
         }
+        return armorItem.getProtection();
     }
 
 
@@ -405,7 +380,6 @@ public class ArmorBarRenderer {
 
         RenderSystem.disableBlend();
         RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
-        RenderSystem.setShaderTexture(0, ICONS);
     }
 
     private void drawEnchantTexture(DrawContext context, int x, int y, Color color, int half) {
