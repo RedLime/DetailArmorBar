@@ -21,6 +21,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ArmorItem;
 import net.minecraft.item.ArmorMaterials;
 import net.minecraft.item.ItemStack;
+import net.minecraft.registry.RegistryKey;
 import net.minecraft.util.Pair;
 import net.minecraft.util.math.MathHelper;
 
@@ -101,17 +102,18 @@ public class ArmorBarRenderer {
         return new Color(255, cc, cc);
     }
 
-    private static Map<Enchantment, LevelData> getEnchantments(Iterable<ItemStack> equipment) {
-        HashMap<Enchantment, LevelData> result = new HashMap<>();
+    private static Map<RegistryKey<Enchantment>, LevelData> getEnchantments(Iterable<ItemStack> equipment) {
+        HashMap<RegistryKey<Enchantment>, LevelData> result = new HashMap<>();
 
         for (ItemStack itemStack : equipment) {
             if (!itemStack.isEmpty()) {
-                EnchantmentHelper.getEnchantments(itemStack).getEnchantmentsMap().forEach(enchantment -> {
-                    LevelData enchantData = result.getOrDefault(enchantment.getKey().value(), new LevelData(0, 0));
+                EnchantmentHelper.getEnchantments(itemStack).getEnchantmentEntries().forEach(enchantment -> {
+                    RegistryKey<Enchantment> enchantType = enchantment.getKey().getKey().orElse(null);
+                    LevelData enchantData = result.getOrDefault(enchantType, new LevelData(0, 0));
                     enchantData.count++;
                     enchantData.level += enchantment.getIntValue();
-                    if (enchantment.getKey().value() == Enchantments.THORNS) enchantData.level += enchantment.getIntValue() - 1;
-                    result.put(enchantment.getKey().value(), enchantData);
+                    if (enchantType == Enchantments.THORNS) enchantData.level += enchantment.getIntValue() - 1;
+                    result.put(enchantType, enchantData);
                 });
             }
         }
@@ -119,7 +121,7 @@ public class ArmorBarRenderer {
         return result;
     }
 
-    private static LevelData getEnchantLevel(Iterable<ItemStack> equipment, Enchantment type) {
+    private static LevelData getEnchantLevel(Iterable<ItemStack> equipment, RegistryKey<Enchantment> type) {
         return getEnchantments(equipment).getOrDefault(type, new LevelData(0, 0));
     }
 
@@ -370,10 +372,10 @@ public class ArmorBarRenderer {
 
                 int xPos = screenWidth + count * 8;
                 if (count * 2 + 1 < thorns.level) {
-                    InGameDrawer.drawTexture(context, xPos, yPos, 36, 18, thornsColor, false);
+                    InGameDrawer.drawTexture(GUI_ARMOR_BAR, context, xPos, yPos, 36, 18, thornsColor, false);
                 }
                 if (count * 2 + 1 == thorns.level) {
-                    InGameDrawer.drawTexture(context, xPos, yPos, 27, 18, thornsColor, false);
+                    InGameDrawer.drawTexture(GUI_ARMOR_BAR, context, xPos, yPos, 27, 18, thornsColor, false);
                 }
             }
         }
@@ -396,6 +398,6 @@ public class ArmorBarRenderer {
             u = 9 + (half * 9);
         } else return;
 
-        InGameDrawer.drawTexture(context, x, y, u, v, color, false);
+        InGameDrawer.drawTexture(GUI_ARMOR_BAR, context, x, y, u, v, color, false);
     }
 }

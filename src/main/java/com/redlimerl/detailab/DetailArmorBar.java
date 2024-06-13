@@ -23,7 +23,7 @@ public class DetailArmorBar implements ClientModInitializer {
 
     public static Logger LOGGER = LogManager.getLogger("DetailArmorBar");
     public static String MOD_ID = "detailab";
-    public static Identifier GUI_ARMOR_BAR = new Identifier(MOD_ID, "textures/armor_bar.png");
+    public static Identifier GUI_ARMOR_BAR = Identifier.of(MOD_ID, "textures/armor_bar.png");
     private final static String[] compatibilityMods = { "healthoverlay" };
 
     private static DetailArmorBarConfig config = null;

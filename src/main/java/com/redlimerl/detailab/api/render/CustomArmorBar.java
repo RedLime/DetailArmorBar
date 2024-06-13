@@ -39,10 +39,10 @@ public class CustomArmorBar {
         RenderSystem.setShaderTexture(0, renderInfo.getTexture());
 
         if (isHalf) {
-            InGameDrawer.drawTexture(context, xPos, yPos, renderInfo.getTextureOffsetHalf().x, renderInfo.getTextureOffsetHalf().y,
+            InGameDrawer.drawTexture(DetailArmorBar.GUI_ARMOR_BAR, context, xPos, yPos, renderInfo.getTextureOffsetHalf().x, renderInfo.getTextureOffsetHalf().y,
                     renderInfo.getTextureWidth(), renderInfo.getTextureHeight(), renderInfo.getColor(), isMirror);
         } else {
-            InGameDrawer.drawTexture(context, xPos, yPos, renderInfo.getTextureOffsetFull().x, renderInfo.getTextureOffsetFull().y,
+            InGameDrawer.drawTexture(DetailArmorBar.GUI_ARMOR_BAR, context, xPos, yPos, renderInfo.getTextureOffsetFull().x, renderInfo.getTextureOffsetFull().y,
                     renderInfo.getTextureWidth(), renderInfo.getTextureHeight(), renderInfo.getColor(), false);
         }
     }
@@ -57,14 +57,14 @@ public class CustomArmorBar {
 
         if (isHalf) {
             if (renderInfo instanceof ItemBarRenderManager) {
-                InGameDrawer.drawTexture(context, xPos + 4, yPos, offset.x + 4, offset.y, 5, 9,
+                InGameDrawer.drawTexture(DetailArmorBar.GUI_ARMOR_BAR, context, xPos + 4, yPos, offset.x + 4, offset.y, 5, 9,
                         renderInfo.getTextureWidth(), renderInfo.getTextureHeight(), color, false);
             } else {
-                InGameDrawer.drawTexture(context, xPos, yPos, offset.x, offset.y,
+                InGameDrawer.drawTexture(DetailArmorBar.GUI_ARMOR_BAR, context, xPos, yPos, offset.x, offset.y,
                         renderInfo.getTextureWidth(), renderInfo.getTextureHeight(), color, isMirror);
             }
         } else {
-            InGameDrawer.drawTexture(context, xPos, yPos, offset.x, offset.y,
+            InGameDrawer.drawTexture(DetailArmorBar.GUI_ARMOR_BAR, context, xPos, yPos, offset.x, offset.y,
                     renderInfo.getTextureWidth(), renderInfo.getTextureHeight(), color, false);
         }
     }
