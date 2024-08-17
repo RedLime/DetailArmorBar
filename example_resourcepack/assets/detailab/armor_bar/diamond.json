@@ -7,14 +7,17 @@
     "minecraft:diamond_boots"
   ],
   "render": {
-    "texture": "detailab:textures/armor_bar.png",
-    "texture_width": 128,
-    "texture_height": 128,
-    "offsets": {
-      "full": [27, 9],
-      "half": [18, 9],
-      "outline": [9, 0],
-      "outline_half": [27, 0]
+    "full": {
+      "texture": "detailab:textures/armor_bar.png",
+      "texture_width": 128,
+      "texture_height": 128,
+      "offset": [ 27, 9 ]
+    },
+    "half": {
+      "texture": "detailab:textures/armor_bar.png",
+      "texture_width": 128,
+      "texture_height": 128,
+      "offset": [ 18, 9 ]
     }
   }
 }

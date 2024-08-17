@@ -2,12 +2,17 @@
   "type": "item",
   "items": [ "minecraft:elytra" ],
   "render": {
-    "texture": "detailab:textures/armor_bar.png",
-    "texture_width": 128,
-    "texture_height": 128,
-    "offsets": {
-      "full": [ 36, 0 ],
-      "outline": [ 54, 0 ]
+    "main": {
+      "texture": "detailab:textures/armor_bar.png",
+      "texture_width": 128,
+      "texture_height": 128,
+      "offset": [36, 0]
+    },
+    "outline": {
+      "texture": "detailab:textures/armor_bar.png",
+      "texture_width": 128,
+      "texture_height": 128,
+      "offset": [54, 0]
     },
     "shown": true
   }
