@@ -2,7 +2,7 @@ package com.redlimerl.detailab.api.render;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import com.redlimerl.detailab.api.data.ColorCodecs;
+import com.redlimerl.detailab.data.ArmorBarCodecs;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.dynamic.Codecs;
 import org.jetbrains.annotations.NotNull;
@@ -16,11 +16,11 @@ public class ArmorBarRenderManager extends BarRenderManager {
             Identifier.CODEC.fieldOf("texture").forGetter(ArmorBarRenderManager::getTexture),
             Codecs.POSITIVE_INT.fieldOf("texture_width").forGetter(ArmorBarRenderManager::getTextureWidth),
             Codecs.POSITIVE_INT.fieldOf("texture_height").forGetter(ArmorBarRenderManager::getTextureHeight),
-            TextureOffsets.CODEC.fieldOf("offsets").forGetter(TextureOffsets::fromRenderManager),
-            ColorCodecs.COLOR_CODEC.optionalFieldOf("color").forGetter(m -> Optional.of(m.color))
+            ArmorBarCodecs.TEXTURE_OFFSETS.fieldOf("offsets").forGetter(ArmorBarCodecs::encodeTextureOffsetes),
+            ArmorBarCodecs.COLOR_CODEC.optionalFieldOf("color").forGetter(m -> Optional.of(m.color))
     ).apply(instance, (id, width, height, offsets, color) ->
-            new ArmorBarRenderManager(id, width, height, offsets.full, offsets.half,
-                    offsets.outline, offsets.outlineHalf, color.orElse(Color.WHITE))
+            new ArmorBarRenderManager(id, width, height, offsets.get("full"), offsets.get("half"),
+                    offsets.get("outline"), offsets.get("outline_half"), color.orElse(Color.WHITE))
     ));
 
     private final Identifier texture;
@@ -93,20 +93,6 @@ public class ArmorBarRenderManager extends BarRenderManager {
     @Override
     public @NotNull Color getColor() {
         return this.color;
-    }
-
-    private record TextureOffsets(TextureOffset full, TextureOffset half, TextureOffset outline, TextureOffset outlineHalf) {
-        static final Codec<TextureOffsets> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-                TextureOffset.CODEC.fieldOf("full").forGetter(TextureOffsets::full),
-                TextureOffset.CODEC.fieldOf("half").forGetter(TextureOffsets::half),
-                TextureOffset.CODEC.fieldOf("outline").forGetter(TextureOffsets::outline),
-                TextureOffset.CODEC.fieldOf("outline_half").forGetter(TextureOffsets::outlineHalf)
-        ).apply(instance, TextureOffsets::new));
-
-        public static TextureOffsets fromRenderManager(ArmorBarRenderManager manager) {
-            return new TextureOffsets(manager.textureOffsetFull, manager.textureOffsetHalf,
-                    manager.textureOffsetOutline, manager.textureOffsetOutlineHalf);
-        }
     }
 
 

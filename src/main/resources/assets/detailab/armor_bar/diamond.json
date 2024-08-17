@@ -1,11 +1,12 @@
 {
+  "type": "armor",
   "items": [
     "minecraft:diamond_helmet",
     "minecraft:diamond_chestplate",
     "minecraft:diamond_leggings",
     "minecraft:diamond_boots"
   ],
-  "renderer": {
+  "render": {
     "texture": "detailab:textures/armor_bar.png",
     "texture_width": 128,
     "texture_height": 128,
@@ -14,7 +15,6 @@
       "half": [18, 9],
       "outline": [9, 0],
       "outline_half": [27, 0]
-    },
-    "color": "78ddf7"
+    }
   }
 }

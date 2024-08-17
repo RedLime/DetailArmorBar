@@ -97,11 +97,11 @@ public class DetailArmorBar implements ClientModInitializer {
                 }
         ).register();
 
-        DetailArmorBarAPI.customItemBarBuilder().item(Items.ELYTRA)
-                .render((ItemStack itemStack) ->
-            new ItemBarRenderManager(GUI_ARMOR_BAR, 128, 128,
-                    new TextureOffset(36, 0), new TextureOffset(54, 0), true)
-        ).register();
+//        DetailArmorBarAPI.customItemBarBuilder().item(Items.ELYTRA)
+//                .render((ItemStack itemStack) ->
+//            new ItemBarRenderManager(GUI_ARMOR_BAR, 128, 128,
+//                    new TextureOffset(36, 0), new TextureOffset(54, 0), true)
+//        ).register();
 
         for (String compatibilityMod : compatibilityMods) {
             if (FabricLoader.getInstance().getModContainer(compatibilityMod).isPresent()) {

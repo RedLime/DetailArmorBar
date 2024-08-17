@@ -1,11 +1,28 @@
 package com.redlimerl.detailab.api.render;
 
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import com.redlimerl.detailab.data.ArmorBarCodecs;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.dynamic.Codecs;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
+import java.util.Optional;
 
 public class ItemBarRenderManager extends BarRenderManager {
+
+    public static final Codec<ItemBarRenderManager> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+            Identifier.CODEC.fieldOf("texture").forGetter(ItemBarRenderManager::getTexture),
+            Codecs.POSITIVE_INT.fieldOf("texture_width").forGetter(ItemBarRenderManager::getTextureWidth),
+            Codecs.POSITIVE_INT.fieldOf("texture_height").forGetter(ItemBarRenderManager::getTextureHeight),
+            ArmorBarCodecs.TEXTURE_OFFSETS.fieldOf("offsets").forGetter(ArmorBarCodecs::encodeTextureOffsetes),
+            Codec.BOOL.optionalFieldOf("shown").forGetter(m -> Optional.of(m.isShown)),
+            ArmorBarCodecs.COLOR_CODEC.optionalFieldOf("color").forGetter(m -> Optional.of(m.color))
+    ).apply(instance, (id, width, height, offsets, shown, color) ->
+            new ItemBarRenderManager(id, width, height, offsets.get("full"),
+                    offsets.get("outline"), shown.orElse(false), color.orElse(Color.WHITE))
+    ));
 
     private final Identifier texture;
     private final int textureWidth;
