@@ -36,14 +36,13 @@ public class CustomArmorBar {
         BarRenderManager renderInfo = predicate.apply(itemStack);
         if (renderInfo.isHidden()) return;
 
+        BarRenderManager.Texture textureInfo = (isHalf) ? renderInfo.getTextureHalf() : renderInfo.getTextureFull();
+        RenderSystem.setShaderTexture(0, textureInfo.location());
+
         if (isHalf) {
-            BarRenderManager.Texture textureInfo = renderInfo.getTextureHalf();
-            RenderSystem.setShaderTexture(0, textureInfo.location());
             InGameDrawer.drawTexture(DetailArmorBar.GUI_ARMOR_BAR, context, xPos, yPos, textureInfo.offset().x, textureInfo.offset().y,
                     textureInfo.width(), textureInfo.height(), renderInfo.getColor(), isMirror);
         } else {
-            BarRenderManager.Texture textureInfo = renderInfo.getTextureFull();
-            RenderSystem.setShaderTexture(0, textureInfo.location());
             InGameDrawer.drawTexture(DetailArmorBar.GUI_ARMOR_BAR, context, xPos, yPos, textureInfo.offset().x, textureInfo.offset().y,
                     textureInfo.width(), textureInfo.height(), renderInfo.getColor(), false);
         }
