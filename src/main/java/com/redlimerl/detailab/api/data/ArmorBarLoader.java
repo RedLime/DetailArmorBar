@@ -69,11 +69,13 @@ public class ArmorBarLoader extends JsonDataLoader implements IdentifiableResour
                 // TODO: Rendering predicates and stuff
                 Optional<CustomArmorBar> barOpt = renderer.map(r -> new CustomArmorBar(stack -> r));
 
-                items.ifPresent(list -> barOpt.ifPresent(bar -> {
+                items.ifPresentOrElse(list -> barOpt.ifPresentOrElse(bar -> {
                     for (ArmorItem item : list) {
                         armorBuilder.put(item, bar);
                     }
-                }));
+                }, () -> DetailArmorBar.LOGGER.error("Armor definition {} is missing a renderer!", id)),
+                        () -> DetailArmorBar.LOGGER.error("Invalid or empty item list in armor definition {}", id));
+
             } catch (Exception ex) {
                 DetailArmorBar.LOGGER.error("Failed to load armor definition [{}]: {}", id, ex);
             }
