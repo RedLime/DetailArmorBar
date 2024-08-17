@@ -90,6 +90,9 @@ public class ArmorBarLoader extends JsonDataLoader implements IdentifiableResour
 
                     items.ifPresentOrElse(list -> barOpt.ifPresentOrElse(bar -> {
                                 for (ArmorItem item : list) {
+                                    if(DetailArmorBarAPI.getStaticItemBarList().containsKey(item))  {
+                                        DetailArmorBar.LOGGER.error("Attempted to override existing armor item {} in definition {}", Registries.ITEM.getId(item), id);
+                                    }
                                     armorBuilder.put(item, bar);
                                 }
                             }, () -> DetailArmorBar.LOGGER.error("Armor definition {} is missing a renderer!", id)),
@@ -112,6 +115,9 @@ public class ArmorBarLoader extends JsonDataLoader implements IdentifiableResour
 
                     items.ifPresentOrElse(list -> barOpt.ifPresentOrElse(bar -> {
                                 for (Item item : list) {
+                                    if(DetailArmorBarAPI.getStaticItemBarList().containsKey(item))  {
+                                        DetailArmorBar.LOGGER.error("Attempted to override existing item {} in definition {}", Registries.ITEM.getId(item), id);
+                                    }
                                     itemBarBuilder.put(item, bar);
                                 }
                             }, () -> DetailArmorBar.LOGGER.error("Item definition {} is missing a renderer!", id)),
