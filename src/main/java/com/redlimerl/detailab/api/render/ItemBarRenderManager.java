@@ -18,7 +18,7 @@ public class ItemBarRenderManager implements BarRenderManager {
     ).apply(instance, ItemBarRenderManager::new));
 
     private final Texture textureFull;
-    private final Texture textureHalf;
+    private final Texture textureOutline;
     private final Color color;
     private final boolean isShown;
 
@@ -39,7 +39,7 @@ public class ItemBarRenderManager implements BarRenderManager {
 
     public ItemBarRenderManager(Texture full, Texture outline, boolean isShown, Color color) {
         this.textureFull = full;
-        this.textureHalf = outline;
+        this.textureOutline = outline;
         this.isShown = isShown;
         this.color = color;
     }
@@ -71,12 +71,12 @@ public class ItemBarRenderManager implements BarRenderManager {
 
     @Override
     public @NotNull Texture getTextureOutline() {
-        return this.textureHalf;
+        return this.textureOutline;
     }
 
     @Override
     public @NotNull Texture getTextureOutlineHalf() {
-        return this.textureHalf;
+        return this.textureOutline;
     }
 
     @Override
