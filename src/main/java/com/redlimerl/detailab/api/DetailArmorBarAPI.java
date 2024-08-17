@@ -1,5 +1,6 @@
 package com.redlimerl.detailab.api;
 
+import com.redlimerl.detailab.api.data.ArmorBarLoader;
 import com.redlimerl.detailab.api.render.CustomArmorBar;
 import net.minecraft.item.ArmorItem;
 import net.minecraft.item.Item;
@@ -15,13 +16,21 @@ public class DetailArmorBarAPI {
         return new ItemBarBuilder();
     }
 
-    static HashMap<ArmorItem, CustomArmorBar> armorList = new HashMap<>();
+    public static final ArmorBarLoader LOADER = new ArmorBarLoader();
+    static HashMap<ArmorItem, CustomArmorBar> staticArmorList = new HashMap<>();
     static HashMap<Item, CustomArmorBar> itemList = new HashMap<>();
 
     public static Map<ArmorItem, CustomArmorBar> getArmorBarList() {
-        return armorList;
+        return LOADER.armorList;
     }
     public static Map<Item, CustomArmorBar> getItemBarList() {
+        return itemList;
+    }
+
+    public static Map<ArmorItem, CustomArmorBar> getStaticArmorBarList() {
+        return staticArmorList;
+    }
+    public static Map<Item, CustomArmorBar> getStaticItemBarList() {
         return itemList;
     }
 }

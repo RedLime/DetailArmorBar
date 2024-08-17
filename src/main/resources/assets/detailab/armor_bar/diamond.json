@@ -1,0 +1,19 @@
+{
+  "armor": [
+    "minecraft:diamond_helmet",
+    "minecraft:diamond_chestplate",
+    "minecraft:diamond_leggings",
+    "minecraft:diamond_boots"
+  ],
+  "renderer": {
+    "texture": "detailab:textures/armor_bar.png",
+    "texture_width": 128,
+    "texture_height": 128,
+    "offsets": {
+      "full": [27, 9],
+      "half": [18, 9],
+      "outline": [9, 0],
+      "outline_half": [27, 0]
+    }
+  }
+}

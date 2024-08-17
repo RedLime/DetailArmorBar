@@ -6,11 +6,13 @@ import com.redlimerl.detailab.api.render.ItemBarRenderManager;
 import com.redlimerl.detailab.api.render.TextureOffset;
 import com.redlimerl.detailab.config.DetailArmorBarConfig;
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.component.type.DyedColorComponent;
 import net.minecraft.item.ArmorItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.resource.ResourceType;
 import net.minecraft.util.Identifier;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -45,6 +47,8 @@ public class DetailArmorBar implements ClientModInitializer {
     }
 
     public void onInitializeClient() {
+        ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(DetailArmorBarAPI.LOADER);
+
         TextureOffset outline = new TextureOffset(9, 0);
         TextureOffset outlineHalf = new TextureOffset(27, 0);
 
@@ -54,11 +58,11 @@ public class DetailArmorBar implements ClientModInitializer {
                     new TextureOffset(9, 9 + isVanillaTexture()), new TextureOffset(0, 9 + isVanillaTexture()), outline, outlineHalf)
         ).register();
 
-        DetailArmorBarAPI.customArmorBarBuilder().armor((ArmorItem) Items.DIAMOND_HELMET, (ArmorItem) Items.DIAMOND_LEGGINGS, (ArmorItem) Items.DIAMOND_CHESTPLATE, (ArmorItem) Items.DIAMOND_BOOTS)
-                .render((ItemStack itemStack) ->
-            new ArmorBarRenderManager(GUI_ARMOR_BAR, 128, 128,
-                    new TextureOffset(27, 9 + isVanillaTexture()), new TextureOffset(18, 9 + isVanillaTexture()), outline, outlineHalf)
-        ).register();
+//        DetailArmorBarAPI.customArmorBarBuilder().armor((ArmorItem) Items.DIAMOND_HELMET, (ArmorItem) Items.DIAMOND_LEGGINGS, (ArmorItem) Items.DIAMOND_CHESTPLATE, (ArmorItem) Items.DIAMOND_BOOTS)
+//                .render((ItemStack itemStack) ->
+//            new ArmorBarRenderManager(GUI_ARMOR_BAR, 128, 128,
+//                    new TextureOffset(27, 9 + isVanillaTexture()), new TextureOffset(18, 9 + isVanillaTexture()), outline, outlineHalf)
+//        ).register();
 
         DetailArmorBarAPI.customArmorBarBuilder().armor((ArmorItem) Items.TURTLE_HELMET)
                 .render((ItemStack itemStack) ->
