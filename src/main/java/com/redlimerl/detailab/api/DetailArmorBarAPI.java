@@ -21,7 +21,7 @@ public class DetailArmorBarAPI {
     static HashMap<Item, CustomArmorBar> itemList = new HashMap<>();
 
     public static Map<ArmorItem, CustomArmorBar> getArmorBarList() {
-        return LOADER.armorList;
+        return LOADER.getArmorList();
     }
     public static Map<Item, CustomArmorBar> getItemBarList() {
         return itemList;

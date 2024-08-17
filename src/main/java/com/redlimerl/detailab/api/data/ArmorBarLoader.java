@@ -32,10 +32,14 @@ public class ArmorBarLoader extends JsonDataLoader implements IdentifiableResour
 
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
 
-    public Map<ArmorItem, CustomArmorBar> armorList;
+    private Map<ArmorItem, CustomArmorBar> armorList;
 
     public ArmorBarLoader() {
         super(GSON, "armor_bar");
+    }
+
+    public Map<ArmorItem, CustomArmorBar> getArmorList() {
+        return armorList;
     }
 
     @Override
@@ -51,8 +55,16 @@ public class ArmorBarLoader extends JsonDataLoader implements IdentifiableResour
         prepared.forEach((id, json) -> {
             try {
                 JsonObject root = json.getAsJsonObject();
-                JsonElement itemsJson = root.get("armor");
+                JsonElement itemsJson = root.get("items");
                 JsonElement rendererJson = root.get("renderer");
+
+                if(!itemsJson.isJsonArray()) {
+                    DetailArmorBar.LOGGER.error("Missing or broken item list in armor definition {}", id);
+                    return;
+                } else if(!rendererJson.isJsonObject()) {
+                    DetailArmorBar.LOGGER.error("Missing or broken renderer in armor definition {}", id);
+                    return;
+                }
 
                 Optional<ArmorItem[]> items = Codec.list(Identifier.CODEC)
                         .decode(JsonOps.INSTANCE, itemsJson)
