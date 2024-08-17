@@ -34,38 +34,41 @@ public class CustomArmorBar {
 
     public void draw(ItemStack itemStack, DrawContext context, int xPos, int yPos, boolean isHalf, boolean isMirror) {
         BarRenderManager renderInfo = predicate.apply(itemStack);
-        if (renderInfo.isShown()) return;
-
-        RenderSystem.setShaderTexture(0, renderInfo.getTexture());
+        if (renderInfo.isHidden()) return;
 
         if (isHalf) {
-            InGameDrawer.drawTexture(DetailArmorBar.GUI_ARMOR_BAR, context, xPos, yPos, renderInfo.getTextureOffsetHalf().x, renderInfo.getTextureOffsetHalf().y,
-                    renderInfo.getTextureWidth(), renderInfo.getTextureHeight(), renderInfo.getColor(), isMirror);
+            BarRenderManager.Texture textureInfo = renderInfo.getTextureHalf();
+            RenderSystem.setShaderTexture(0, textureInfo.location());
+            InGameDrawer.drawTexture(DetailArmorBar.GUI_ARMOR_BAR, context, xPos, yPos, textureInfo.offset().x, textureInfo.offset().y,
+                    textureInfo.width(), textureInfo.height(), renderInfo.getColor(), isMirror);
         } else {
-            InGameDrawer.drawTexture(DetailArmorBar.GUI_ARMOR_BAR, context, xPos, yPos, renderInfo.getTextureOffsetFull().x, renderInfo.getTextureOffsetFull().y,
-                    renderInfo.getTextureWidth(), renderInfo.getTextureHeight(), renderInfo.getColor(), false);
+            BarRenderManager.Texture textureInfo = renderInfo.getTextureFull();
+            RenderSystem.setShaderTexture(0, textureInfo.location());
+            InGameDrawer.drawTexture(DetailArmorBar.GUI_ARMOR_BAR, context, xPos, yPos, textureInfo.offset().x, textureInfo.offset().y,
+                    textureInfo.width(), textureInfo.height(), renderInfo.getColor(), false);
         }
     }
 
     public void drawOutLine(ItemStack itemStack, DrawContext context, int xPos, int yPos, boolean isHalf, boolean isMirror, Color color) {
         BarRenderManager renderInfo = predicate.apply(itemStack);
-        if (renderInfo.isShown()) return;
+        if (renderInfo.isHidden()) return;
 
-        RenderSystem.setShaderTexture(0, renderInfo.getTexture());
-
-        TextureOffset offset = isHalf ? renderInfo.getTextureOffsetOutlineHalf() : renderInfo.getTextureOffsetOutline();
+        BarRenderManager.Texture textureInfo = isHalf ? renderInfo.getTextureOutlineHalf() : renderInfo.getTextureOutline();
+        TextureOffset offset = textureInfo.offset();
 
         if (isHalf) {
             if (renderInfo instanceof ItemBarRenderManager) {
+                RenderSystem.setShaderTexture(0, textureInfo.location());
                 InGameDrawer.drawTexture(DetailArmorBar.GUI_ARMOR_BAR, context, xPos + 4, yPos, offset.x + 4, offset.y, 5, 9,
-                        renderInfo.getTextureWidth(), renderInfo.getTextureHeight(), color, false);
+                        textureInfo.width(), textureInfo.height(), color, false);
             } else {
+                RenderSystem.setShaderTexture(0, textureInfo.location());
                 InGameDrawer.drawTexture(DetailArmorBar.GUI_ARMOR_BAR, context, xPos, yPos, offset.x, offset.y,
-                        renderInfo.getTextureWidth(), renderInfo.getTextureHeight(), color, isMirror);
+                        textureInfo.width(), textureInfo.height(), color, isMirror);
             }
         } else {
             InGameDrawer.drawTexture(DetailArmorBar.GUI_ARMOR_BAR, context, xPos, yPos, offset.x, offset.y,
-                    renderInfo.getTextureWidth(), renderInfo.getTextureHeight(), color, false);
+                    textureInfo.width(), textureInfo.height(), color, false);
         }
     }
 }
