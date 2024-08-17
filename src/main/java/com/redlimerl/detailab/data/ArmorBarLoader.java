@@ -92,6 +92,7 @@ public class ArmorBarLoader extends JsonDataLoader implements IdentifiableResour
                                 for (ArmorItem item : list) {
                                     if(DetailArmorBarAPI.getStaticItemBarList().containsKey(item))  {
                                         DetailArmorBar.LOGGER.error("Attempted to override existing armor item {} in definition {}", Registries.ITEM.getId(item), id);
+                                        return;
                                     }
                                     armorBuilder.put(item, bar);
                                 }
@@ -117,6 +118,7 @@ public class ArmorBarLoader extends JsonDataLoader implements IdentifiableResour
                                 for (Item item : list) {
                                     if(DetailArmorBarAPI.getStaticItemBarList().containsKey(item))  {
                                         DetailArmorBar.LOGGER.error("Attempted to override existing item {} in definition {}", Registries.ITEM.getId(item), id);
+                                        return;
                                     }
                                     itemBarBuilder.put(item, bar);
                                 }
