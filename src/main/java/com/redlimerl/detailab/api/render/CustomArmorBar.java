@@ -55,14 +55,13 @@ public class CustomArmorBar {
 
         BarRenderManager.Texture textureInfo = isHalf ? renderInfo.getTextureOutlineHalf() : renderInfo.getTextureOutline();
         TextureOffset offset = textureInfo.offset();
+        RenderSystem.setShaderTexture(0, textureInfo.location());
 
         if (isHalf) {
             if (renderInfo instanceof ItemBarRenderManager) {
-                RenderSystem.setShaderTexture(0, textureInfo.location());
                 InGameDrawer.drawTexture(DetailArmorBar.GUI_ARMOR_BAR, context, xPos + 4, yPos, offset.x + 4, offset.y, 5, 9,
                         textureInfo.width(), textureInfo.height(), color, false);
             } else {
-                RenderSystem.setShaderTexture(0, textureInfo.location());
                 InGameDrawer.drawTexture(DetailArmorBar.GUI_ARMOR_BAR, context, xPos, yPos, offset.x, offset.y,
                         textureInfo.width(), textureInfo.height(), color, isMirror);
             }
