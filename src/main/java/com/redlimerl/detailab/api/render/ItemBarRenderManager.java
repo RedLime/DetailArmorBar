@@ -13,7 +13,7 @@ public class ItemBarRenderManager implements BarRenderManager {
     public static final Codec<ItemBarRenderManager> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             Texture.CODEC.fieldOf("main").forGetter(ItemBarRenderManager::getTextureFull),
             Texture.CODEC.fieldOf("outline").forGetter(ItemBarRenderManager::getTextureOutline),
-            Codec.BOOL.fieldOf("is_shown").forGetter(i -> i.isShown),
+            Codec.BOOL.optionalFieldOf("is_shown", true).forGetter(i -> i.isShown),
             ArmorBarCodecs.COLOR_CODEC.optionalFieldOf("color", Color.WHITE).forGetter(ItemBarRenderManager::getColor)
     ).apply(instance, ItemBarRenderManager::new));
 
@@ -33,10 +33,14 @@ public class ItemBarRenderManager implements BarRenderManager {
                 isShown, color);
     }
 
-    public ItemBarRenderManager(Texture full, Texture outline, boolean shown, Color color) {
+    public ItemBarRenderManager(Texture full, Texture outline, boolean isShown) {
+        this(full, outline, isShown, Color.WHITE);
+    }
+
+    public ItemBarRenderManager(Texture full, Texture outline, boolean isShown, Color color) {
         this.textureFull = full;
         this.textureHalf = outline;
-        this.isShown = shown;
+        this.isShown = isShown;
         this.color = color;
     }
 
