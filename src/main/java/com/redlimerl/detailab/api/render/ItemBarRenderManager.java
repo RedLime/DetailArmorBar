@@ -3,6 +3,7 @@ package com.redlimerl.detailab.api.render;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.redlimerl.detailab.data.ArmorBarCodecs;
+import net.minecraft.predicate.entity.LootContextPredicate;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.dynamic.Codecs;
 import org.jetbrains.annotations.NotNull;

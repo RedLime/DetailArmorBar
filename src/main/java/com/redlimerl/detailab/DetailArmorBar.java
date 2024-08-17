@@ -58,11 +58,11 @@ public class DetailArmorBar implements ClientModInitializer {
                     new TextureOffset(9, 9 + isVanillaTexture()), new TextureOffset(0, 9 + isVanillaTexture()), outline, outlineHalf)
         ).register();
 
-//        DetailArmorBarAPI.customArmorBarBuilder().armor((ArmorItem) Items.DIAMOND_HELMET, (ArmorItem) Items.DIAMOND_LEGGINGS, (ArmorItem) Items.DIAMOND_CHESTPLATE, (ArmorItem) Items.DIAMOND_BOOTS)
-//                .render((ItemStack itemStack) ->
-//            new ArmorBarRenderManager(GUI_ARMOR_BAR, 128, 128,
-//                    new TextureOffset(27, 9 + isVanillaTexture()), new TextureOffset(18, 9 + isVanillaTexture()), outline, outlineHalf)
-//        ).register();
+        DetailArmorBarAPI.customArmorBarBuilder().armor((ArmorItem) Items.DIAMOND_HELMET, (ArmorItem) Items.DIAMOND_LEGGINGS, (ArmorItem) Items.DIAMOND_CHESTPLATE, (ArmorItem) Items.DIAMOND_BOOTS)
+                .render((ItemStack itemStack) ->
+            new ArmorBarRenderManager(GUI_ARMOR_BAR, 128, 128,
+                    new TextureOffset(27, 9 + isVanillaTexture()), new TextureOffset(18, 9 + isVanillaTexture()), outline, outlineHalf)
+        ).register();
 
         DetailArmorBarAPI.customArmorBarBuilder().armor((ArmorItem) Items.TURTLE_HELMET)
                 .render((ItemStack itemStack) ->
@@ -97,11 +97,11 @@ public class DetailArmorBar implements ClientModInitializer {
                 }
         ).register();
 
-//        DetailArmorBarAPI.customItemBarBuilder().item(Items.ELYTRA)
-//                .render((ItemStack itemStack) ->
-//            new ItemBarRenderManager(GUI_ARMOR_BAR, 128, 128,
-//                    new TextureOffset(36, 0), new TextureOffset(54, 0), true)
-//        ).register();
+        DetailArmorBarAPI.customItemBarBuilder().item(Items.ELYTRA)
+                .render((ItemStack itemStack) ->
+            new ItemBarRenderManager(GUI_ARMOR_BAR, 128, 128,
+                    new TextureOffset(36, 0), new TextureOffset(54, 0), true)
+        ).register();
 
         for (String compatibilityMod : compatibilityMods) {
             if (FabricLoader.getInstance().getModContainer(compatibilityMod).isPresent()) {

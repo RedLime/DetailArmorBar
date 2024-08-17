@@ -8,7 +8,7 @@ import net.minecraft.util.dynamic.Codecs;
 import java.util.List;
 
 public class TextureOffset {
-    public static final Codec<TextureOffset> CODEC = Codec.list(Codecs.NONNEGATIVE_INT)
+    public static final Codec<TextureOffset> CODEC = Codecs.NONNEGATIVE_INT.listOf(2, 2)
             .xmap(ints -> new TextureOffset(ints.get(0), ints.get(1)),
                     texoff -> List.of(texoff.x, texoff.y)
             );
