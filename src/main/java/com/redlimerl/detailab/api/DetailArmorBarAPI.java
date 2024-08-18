@@ -20,10 +20,10 @@ public class DetailArmorBarAPI {
     static HashMap<Item, CustomArmorBar> staticItemList = new HashMap<>();
 
     public static Map<ArmorItem, CustomArmorBar> getArmorBarList() {
-        return LOADER.getArmorList();
+        return LOADER.isLoaded() ? LOADER.getArmorList() : staticArmorList;
     }
     public static Map<Item, CustomArmorBar> getItemBarList() {
-        return LOADER.getItemList();
+        return LOADER.isLoaded() ? LOADER.getItemList() : staticItemList;
     }
 
     public static Map<ArmorItem, CustomArmorBar> getStaticArmorBarList() {

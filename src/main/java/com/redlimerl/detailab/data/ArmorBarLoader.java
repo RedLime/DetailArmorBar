@@ -44,6 +44,10 @@ public class ArmorBarLoader extends JsonDataLoader implements IdentifiableResour
         return itemList;
     }
 
+    public boolean isLoaded() {
+        return armorList != null && itemList != null;
+    }
+
     @Override
     public Identifier getFabricId() {
         return Identifier.of(DetailArmorBar.MOD_ID, "armor");
