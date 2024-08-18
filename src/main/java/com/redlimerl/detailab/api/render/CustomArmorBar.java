@@ -37,13 +37,12 @@ public class CustomArmorBar {
         if (renderInfo.isHidden()) return;
 
         BarRenderManager.Texture textureInfo = (isHalf) ? renderInfo.getTextureHalf() : renderInfo.getTextureFull();
-        RenderSystem.setShaderTexture(0, textureInfo.location());
 
         if (isHalf) {
-            InGameDrawer.drawTexture(DetailArmorBar.GUI_ARMOR_BAR, context, xPos, yPos, textureInfo.offset().x, textureInfo.offset().y,
+            InGameDrawer.drawTexture(textureInfo.location(), context, xPos, yPos, textureInfo.offset().x, textureInfo.offset().y,
                     textureInfo.width(), textureInfo.height(), renderInfo.getColor(), isMirror);
         } else {
-            InGameDrawer.drawTexture(DetailArmorBar.GUI_ARMOR_BAR, context, xPos, yPos, textureInfo.offset().x, textureInfo.offset().y,
+            InGameDrawer.drawTexture(textureInfo.location(), context, xPos, yPos, textureInfo.offset().x, textureInfo.offset().y,
                     textureInfo.width(), textureInfo.height(), renderInfo.getColor(), false);
         }
     }
@@ -54,18 +53,17 @@ public class CustomArmorBar {
 
         BarRenderManager.Texture textureInfo = isHalf ? renderInfo.getTextureOutlineHalf() : renderInfo.getTextureOutline();
         TextureOffset offset = textureInfo.offset();
-        RenderSystem.setShaderTexture(0, textureInfo.location());
 
         if (isHalf) {
             if (renderInfo instanceof ItemBarRenderManager) {
-                InGameDrawer.drawTexture(DetailArmorBar.GUI_ARMOR_BAR, context, xPos + 4, yPos, offset.x + 4, offset.y, 5, 9,
+                InGameDrawer.drawTexture(textureInfo.location(), context, xPos + 4, yPos, offset.x + 4, offset.y, 5, 9,
                         textureInfo.width(), textureInfo.height(), color, false);
             } else {
-                InGameDrawer.drawTexture(DetailArmorBar.GUI_ARMOR_BAR, context, xPos, yPos, offset.x, offset.y,
+                InGameDrawer.drawTexture(textureInfo.location(), context, xPos, yPos, offset.x, offset.y,
                         textureInfo.width(), textureInfo.height(), color, isMirror);
             }
         } else {
-            InGameDrawer.drawTexture(DetailArmorBar.GUI_ARMOR_BAR, context, xPos, yPos, offset.x, offset.y,
+            InGameDrawer.drawTexture(textureInfo.location(), context, xPos, yPos, offset.x, offset.y,
                     textureInfo.width(), textureInfo.height(), color, false);
         }
     }
