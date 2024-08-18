@@ -7,8 +7,6 @@ import com.redlimerl.detailab.data.ArmorBarCodecs;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.NotNull;
 
-import java.awt.Color;
-
 public class ArmorBarRenderManager implements BarRenderManager {
 
     private static final Texture DEFAULT_OUTLINE = new Texture(DetailArmorBar.GUI_ARMOR_BAR, 128, 128, new TextureOffset(9, 0));

@@ -1,10 +1,7 @@
 package com.redlimerl.detailab.api.render;
 
 import com.mojang.serialization.Codec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.text.Style;
 import net.minecraft.util.dynamic.Codecs;
-
 import java.util.List;
 
 public class TextureOffset {
