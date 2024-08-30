@@ -44,7 +44,7 @@ public class ArmorBarBuilder {
         try {
             CustomArmorBar armorBar = new CustomArmorBar(predicate);
             for (ArmorItem armorItem : armor) {
-                DetailArmorBarAPI.armorList.put(armorItem, armorBar);
+                DetailArmorBarAPI.staticArmorList.put(armorItem, armorBar);
             }
             if (armor.length != 0) {
                 DetailArmorBar.LOGGER.log(Level.INFO, "Successfully registered '"+ Registries.ITEM.getId(armor[0]) + (armor.length > 1 ? "' and "+(armor.length-1)+" more items" : "'") + "!");

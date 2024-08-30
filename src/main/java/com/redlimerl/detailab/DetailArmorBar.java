@@ -6,11 +6,13 @@ import com.redlimerl.detailab.api.render.ItemBarRenderManager;
 import com.redlimerl.detailab.api.render.TextureOffset;
 import com.redlimerl.detailab.config.DetailArmorBarConfig;
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.component.type.DyedColorComponent;
 import net.minecraft.item.ArmorItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.resource.ResourceType;
 import net.minecraft.util.Identifier;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -45,6 +47,8 @@ public class DetailArmorBar implements ClientModInitializer {
     }
 
     public void onInitializeClient() {
+        ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(DetailArmorBarAPI.LOADER);
+
         TextureOffset outline = new TextureOffset(9, 0);
         TextureOffset outlineHalf = new TextureOffset(27, 0);
 

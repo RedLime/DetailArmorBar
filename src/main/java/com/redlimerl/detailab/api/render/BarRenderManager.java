@@ -1,33 +1,40 @@
 package com.redlimerl.detailab.api.render;
 
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.dynamic.Codecs;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
 
-public abstract class BarRenderManager {
+public interface BarRenderManager {
 
     @NotNull
-    public abstract Identifier getTexture();
-
-    public abstract int getTextureWidth();
-
-    public abstract int getTextureHeight();
+    Texture getTextureFull();
 
     @NotNull
-    public abstract TextureOffset getTextureOffsetFull();
+    Texture getTextureHalf();
 
     @NotNull
-    public abstract TextureOffset getTextureOffsetHalf();
+    Texture getTextureOutline();
 
     @NotNull
-    public abstract TextureOffset getTextureOffsetOutline();
+    Texture getTextureOutlineHalf();
+
+    boolean isHidden();
 
     @NotNull
-    public abstract TextureOffset getTextureOffsetOutlineHalf();
+    Color getColor();
 
-    public abstract boolean isShown();
+    record Texture(Identifier location, int width, int height, TextureOffset offset) {
 
-    @NotNull
-    public abstract Color getColor();
+        public static final Codec<Texture> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+                Identifier.CODEC.fieldOf("texture").forGetter(Texture::location),
+                Codecs.POSITIVE_INT.fieldOf("texture_width").forGetter(Texture::width),
+                Codecs.POSITIVE_INT.fieldOf("texture_height").forGetter(Texture::height),
+                TextureOffset.CODEC.fieldOf("offset").forGetter(Texture::offset)
+        ).apply(instance, Texture::new));
+
+    }
 }

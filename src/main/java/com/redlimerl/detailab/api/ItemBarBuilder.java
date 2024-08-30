@@ -41,7 +41,7 @@ public class ItemBarBuilder {
      */
     public void register() {
         try {
-            DetailArmorBarAPI.itemList.put(item, new CustomArmorBar(predicate));
+            DetailArmorBarAPI.staticItemList.put(item, new CustomArmorBar(predicate));
             DetailArmorBar.LOGGER.log(Level.INFO, "Successfully registered '"+ Registries.ITEM.getId(item) + "'!");
         } catch (Exception e) {
             throw new IllegalStateException("Not all items have been initialized");
