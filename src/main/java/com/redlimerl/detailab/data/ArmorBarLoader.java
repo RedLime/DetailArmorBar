@@ -25,7 +25,7 @@ import net.minecraft.util.profiler.Profiler;
 import java.util.Map;
 import java.util.Optional;
 
-public class ArmorBarLoader extends JsonDataLoader implements IdentifiableResourceReloadListener {
+public class ArmorBarLoader extends JsonDataLoader<JsonElement> implements IdentifiableResourceReloadListener {
 
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
 

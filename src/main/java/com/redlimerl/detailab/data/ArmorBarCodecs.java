@@ -18,7 +18,7 @@ public final class ArmorBarCodecs {
             col -> Integer.toHexString(col.getRGB())
     );
 
-    public static final Codec<Color> RGB_COLOR_CODEC = Codecs.NONNEGATIVE_INT.listOf(3, 3).xmap(
+    public static final Codec<Color> RGB_COLOR_CODEC = Codecs.NON_NEGATIVE_INT.listOf(3, 3).xmap(
             ints -> new Color(ints.get(0), ints.get(1), ints.get(2)),
             col -> List.of(col.getRed(), col.getGreen(), col.getBlue())
     );
