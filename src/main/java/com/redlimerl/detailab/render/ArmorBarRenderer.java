@@ -7,19 +7,20 @@ import com.redlimerl.detailab.api.render.CustomArmorBar;
 import com.redlimerl.detailab.config.ConfigEnumType.Animation;
 import com.redlimerl.detailab.config.ConfigEnumType.ProtectionEffect;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gl.ShaderProgramKeys;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.hud.InGameHud;
-import net.minecraft.client.render.GameRenderer;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.AttributeModifiersComponent;
+import net.minecraft.component.type.EquippableComponent;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
+import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.attribute.EntityAttributeInstance;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ArmorItem;
-import net.minecraft.item.ArmorMaterials;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.util.Pair;
@@ -125,12 +126,14 @@ public class ArmorBarRenderer {
         return getEnchantments(equipment).getOrDefault(type, new LevelData(0, 0));
     }
 
-    private int getLowDurabilityItem(Iterable<ItemStack> equipment) {
+    private int getLowDurabilityItem(Iterable<Pair<EquipmentSlot, ItemStack>> equipment) {
         var count = 0;
-        for (ItemStack itemStack : equipment) {
+        for (Pair<EquipmentSlot, ItemStack> pair : equipment) {
+            ItemStack itemStack = pair.getRight();
+            EquipmentSlot slot = pair.getLeft();
             if (!itemStack.isEmpty()) {
                 if (itemStack.getMaxDamage() != 0 && ((itemStack.getDamage() * 100f) / (itemStack.getMaxDamage() * 100f)) >= 0.92f) {
-                    count += itemStack.getItem() instanceof ArmorItem ? getDefense(itemStack) : 2;
+                    count += itemStack.getItem() instanceof ArmorItem ? getDefense(itemStack, slot) : 2;
                 }
             }
         }
@@ -139,16 +142,21 @@ public class ArmorBarRenderer {
 
     private static List<Pair<ItemStack, CustomArmorBar>> getArmorPoints(PlayerEntity player) {
         ArrayList<Pair<ItemStack, CustomArmorBar>> armorItem = new ArrayList<>();
-        Stack<ItemStack> equipment = new Stack<>();
-        for (ItemStack item : player.getArmorItems()) {
-            if (getConfig().getOptions().toggleInverseSlot) {
-                equipment.push(item);
-            } else {
-                equipment.add(0, item);
+        Stack<Pair<EquipmentSlot, ItemStack>> equipment = new Stack<>();
+
+        for (EquipmentSlot equipmentSlot : EquipmentSlot.VALUES) {
+            ItemStack itemStack = player.getEquippedStack(equipmentSlot);
+            EquippableComponent equippableComponent = itemStack.get(DataComponentTypes.EQUIPPABLE);
+            if (equippableComponent != null && equippableComponent.slot() == equipmentSlot) {
+                if (getConfig().getOptions().toggleInverseSlot) {
+                    equipment.push(new Pair<>(equipmentSlot, itemStack));
+                } else {
+                    equipment.addFirst(new Pair<>(equipmentSlot, itemStack));
+                }
             }
         }
 
-        EntityAttributeInstance attribute = player.getAttributeInstance(EntityAttributes.GENERIC_ARMOR);
+        EntityAttributeInstance attribute = player.getAttributeInstance(EntityAttributes.ARMOR);
         if (attribute != null) {
         	double d = attribute.getBaseValue();
         	for (int i = 0; i < d; i++) {
@@ -156,19 +164,23 @@ public class ArmorBarRenderer {
         	}
         }
 
-        for (ItemStack itemStack : equipment) {
+        for (Pair<EquipmentSlot, ItemStack> pair : equipment) {
+            ItemStack itemStack = pair.getRight();
+            EquipmentSlot slot = pair.getLeft();
             if (!itemStack.isEmpty()) {
                 if (itemStack.getItem() instanceof ArmorItem armor) {
                     CustomArmorBar barData;
                     if (getConfig().getOptions().toggleArmorTypes) {
                         barData = DetailArmorBarAPI.getArmorBarList().getOrDefault(armor, CustomArmorBar.DEFAULT);
-                    } else if (getConfig().getOptions().toggleNetherites && armor.getMaterial() == ArmorMaterials.NETHERITE) {
-                        barData = DetailArmorBarAPI.getArmorBarList().getOrDefault(armor, CustomArmorBar.DEFAULT);
-                    } else {
+                    }
+//                    else if (getConfig().getOptions().toggleNetherites) {
+//                        barData = DetailArmorBarAPI.getArmorBarList().getOrDefault(armor, CustomArmorBar.DEFAULT);
+//                    }
+                    else {
                         barData = CustomArmorBar.DEFAULT;
                     }
 
-                    for (int i = 0; i < getDefense(itemStack); i++) {
+                    for (int i = 0; i < getDefense(itemStack, slot); i++) {
                         armorItem.add(new Pair<>(itemStack, barData));
                     }
                 } else if (getConfig().getOptions().toggleItemBar && !getConfig().getOptions().toggleSortSpecialItem
@@ -184,7 +196,8 @@ public class ArmorBarRenderer {
         }
 
         if (getConfig().getOptions().toggleItemBar && getConfig().getOptions().toggleSortSpecialItem) {
-            for (ItemStack itemStack : equipment) {
+            for (Pair<EquipmentSlot, ItemStack> pair : equipment) {
+                ItemStack itemStack = pair.getRight();
                 if (!itemStack.isEmpty() && !(itemStack.getItem() instanceof ArmorItem) && DetailArmorBarAPI.getItemBarList().containsKey(itemStack.getItem())) {
                     if (armorItem.size() % 2 == 1)
                         armorItem.add(new Pair<>(ItemStack.EMPTY, CustomArmorBar.EMPTY));
@@ -198,15 +211,14 @@ public class ArmorBarRenderer {
         return armorItem;
     }
 
-    private static int getDefense(ItemStack itemStack) {
-        ArmorItem armorItem = (ArmorItem) itemStack.getItem();
+    private static int getDefense(ItemStack itemStack, EquipmentSlot slot) {
         AttributeModifiersComponent modifier = itemStack.getOrDefault(DataComponentTypes.ATTRIBUTE_MODIFIERS, AttributeModifiersComponent.DEFAULT);
         for (AttributeModifiersComponent.Entry entry : modifier.modifiers()) {
-            if (entry.slot().matches(armorItem.getSlotType()) && entry.attribute().equals(EntityAttributes.GENERIC_ARMOR)) {
+            if (entry.slot().matches(slot) && entry.attribute().equals(EntityAttributes.ARMOR)) {
                 return (int) entry.modifier().value();
             }
         }
-        return armorItem.getProtection();
+        return 0;
     }
 
 
@@ -215,8 +227,6 @@ public class ArmorBarRenderer {
     private final InGameHud hud = client.inGameHud;
 
     public void render(DrawContext context, PlayerEntity player) {
-        client.getProfiler().swap("armor");
-
         var generic = getEnchantLevel(player.getArmorItems(), Enchantments.PROTECTION);
         var projectile = getEnchantLevel(player.getArmorItems(), Enchantments.PROJECTILE_PROTECTION);
         var explosive = getEnchantLevel(player.getArmorItems(), Enchantments.BLAST_PROTECTION);
@@ -228,7 +238,7 @@ public class ArmorBarRenderer {
         var playerHealth = MathHelper.ceil(player.getHealth());
         var totalArmorPoint = armorPoints.size();
         var totalEnchants = Arrays.stream(protectArr).sum();
-        var maxHealth = Math.max(player.getAttributeValue(EntityAttributes.GENERIC_MAX_HEALTH), playerHealth);
+        var maxHealth = Math.max(player.getAttributeValue(EntityAttributes.MAX_HEALTH), playerHealth);
         var absorptionHealth = MathHelper.ceil(player.getAbsorptionAmount());
         var healthRow = getConfig().getOptions().toggleCompatibleHeartMod ? 1 : MathHelper.ceil((maxHealth + absorptionHealth) / 20.0f);
         var screenWidth = client.getWindow().getScaledWidth() / 2 - 91;
@@ -239,7 +249,7 @@ public class ArmorBarRenderer {
         int stackRow = stackCount * 20;
 
         RenderSystem.enableBlend();
-        RenderSystem.setShader(GameRenderer::getPositionTexProgram);
+        RenderSystem.setShader(ShaderProgramKeys.POSITION_TEX);
 
         //Default
         if (totalArmorPoint > 0) {
@@ -276,7 +286,17 @@ public class ArmorBarRenderer {
 
         //Durability Color
         if (getConfig().getOptions().toggleDurability) {
-            int lowDur = getLowDurabilityItem(player.getArmorItems());
+            List<Pair<EquipmentSlot, ItemStack>> equipment = new ArrayList<>();
+
+            for (EquipmentSlot equipmentSlot : EquipmentSlot.VALUES) {
+                ItemStack itemStack = player.getEquippedStack(equipmentSlot);
+                EquippableComponent equippableComponent = itemStack.get(DataComponentTypes.EQUIPPABLE);
+                if (equippableComponent != null && equippableComponent.slot() == equipmentSlot) {
+                    equipment.add(new Pair<>(equipmentSlot, itemStack));
+                }
+            }
+
+            int lowDur = getLowDurabilityItem(equipment);
 
             if (totalArmorPoint != 0 && lowDur != 0) {
                 Color lowDurColor = getLowDurabilityColor();

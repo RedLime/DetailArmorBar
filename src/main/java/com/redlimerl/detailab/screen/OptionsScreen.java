@@ -53,15 +53,15 @@ public class OptionsScreen extends Screen {
             );
             buttonCount++;
 
-            addDrawableChild(
-                    ButtonWidget.builder(getToggleName("netherites", getConfig().getOptions().toggleNetherites), (button) -> {
-                        getConfig().getOptions().toggleNetherites = !getConfig().getOptions().toggleNetherites; getConfig().save();
-                        button.setMessage(getToggleName("netherites", getConfig().getOptions().toggleNetherites));
-                    }).dimensions(width / 2 - 155 + buttonCount % 2 * 160, height / 6 - 12 + 24 * (buttonCount / 2), 150, 20)
-                        .tooltip(Tooltip.of(Text.translatable("context.detailarmorbar.toggle.netherites")))
-                        .build()
-            );
-            buttonCount++;
+//            addDrawableChild(
+//                    ButtonWidget.builder(getToggleName("netherites", getConfig().getOptions().toggleNetherites), (button) -> {
+//                        getConfig().getOptions().toggleNetherites = !getConfig().getOptions().toggleNetherites; getConfig().save();
+//                        button.setMessage(getToggleName("netherites", getConfig().getOptions().toggleNetherites));
+//                    }).dimensions(width / 2 - 155 + buttonCount % 2 * 160, height / 6 - 12 + 24 * (buttonCount / 2), 150, 20)
+//                        .tooltip(Tooltip.of(Text.translatable("context.detailarmorbar.toggle.netherites")))
+//                        .build()
+//            );
+//            buttonCount++;
 
             addDrawableChild(ButtonWidget.builder(getToggleName("thorns", getConfig().getOptions().toggleThorns), (button) -> {
                         getConfig().getOptions().toggleThorns = !getConfig().getOptions().toggleThorns; getConfig().save();

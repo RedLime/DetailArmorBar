@@ -60,7 +60,7 @@ public class DetailArmorBarConfig {
         public Animation effectThorn = Animation.ANIMATION;
 
         public boolean toggleEnchants = true;
-        public boolean toggleNetherites = true;
+//        public boolean toggleNetherites = true;
         public boolean toggleArmorTypes = true;
         public boolean toggleThorns = true;
         public boolean toggleDurability = true;
