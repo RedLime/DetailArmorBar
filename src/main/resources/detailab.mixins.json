@@ -1,0 +1,18 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.redlimerl.detailab.mixins",
+  "compatibilityLevel": "JAVA_8",
+  "refmap": "detailab.refmap.json",
+  "mixins": [
+  ],
+  "client": [
+    "ArmorBarMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "overwrites": {
+    "requireAnnotations": true
+  }
+}
