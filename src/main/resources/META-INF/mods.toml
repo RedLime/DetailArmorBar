@@ -5,12 +5,11 @@ license="MIT Licence"
 [[mods]]
 modId="detailab"
 version="${file.jarVersion}"
-displayName="Detail Armor Bar"
+displayName="细节盔甲条：重装"
 logoFile="icon.png"
 authors="RedLime"
-credits="snessim, Heamaci, Autovw"
-description='''Show more details of armors in Armor bar!'''
-displayURL="https://github.com/RedLime/DetailArmorBar/tree/1.19-forge"
+credits="snessim, Heamaci, Autovw, 木板"
+description='''细节盔甲条的1.20.1重制升级版'''
 
 [[dependencies.detailab]]
     modId="forge"

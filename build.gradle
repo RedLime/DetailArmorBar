@@ -18,9 +18,9 @@ apply plugin: 'org.parchmentmc.librarian.forgegradle'
 apply plugin: 'maven-publish'
 //apply plugin: 'org.spongepowered.mixin'
 
-version = '2.6.4+1.20.1-forge'
+version = '2.7.0+1.20.1-forge'
 group = 'com.redlimerl.detailab' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
-archivesBaseName = 'DetailArmorBar'
+archivesBaseName = 'Detail Armor Bar Re-equipment'
 
 // Mojang ships Java 16 to end users in 1.17+ instead of Java 8 in 1.16 or lower, so your mod should target Java 16.
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
